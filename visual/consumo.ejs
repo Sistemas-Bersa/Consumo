@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consumo | Bersa Cloud</title>
+    <title>Salida de Inventario | Bersa</title>
     <link rel="stylesheet" href="/estilos.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -12,10 +12,10 @@
         <!-- HEADER -->
         <header class="header-top">
             <div class="brand">
-                <div class="brand-icon"><i data-lucide="layout-list" style="color: var(--azul-bersa)"></i></div>
+                <div class="brand-icon"><i data-lucide="minus-circle" style="color: var(--azul-bersa)"></i></div>
                 <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
             </div>
-            <a href="https://bersacloud.app" class="btn-bersa btn-naranja">
+            <a href="https://bersacloud.app" class="btn-inicio">
                 <i data-lucide="home" size="18"></i> INICIO
             </a>
         </header>
@@ -31,82 +31,95 @@
                 </select>
             </div>
             <div>
-                <label class="label-herramienta">BUSCAR ARTÍCULO</label>
-                <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+                <label class="label-herramienta">BUSCAR PRODUCTO</label>
+                <input type="text" id="buscador" class="search-input" placeholder="Escribir nombre..." onkeyup="filtrarTabla()">
             </div>
-            <button onclick="confirmarConsumo()" class="btn-bersa btn-rojo" <%= datos.length === 0 ? 'disabled' : '' %>>
-                <i data-lucide="check-square" size="18"></i> CONFIRMAR AJUSTE
+            <button onclick="registrarSalidas()" class="btn-guardar-top">
+                <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
             </button>
         </div>
 
-        <!-- TABLA COMPARATIVA -->
+        <!-- TABLA -->
         <div class="table-wrapper">
             <table class="stock-table" id="tablaStock">
                 <thead>
                     <tr>
-                        <th style="width: 40%;">Producto</th>
-                        <th style="text-align: center;">Teórico</th>
-                        <th style="text-align: center;">Físico</th>
-                        <th style="text-align: center;">Diferencia</th>
-                        <th style="text-align: center;">Estado</th>
+                        <th style="width: 40%;">Producto / Descripción</th>
+                        <th style="width: 15%;">Unidad</th>
+                        <th style="width: 15%;">Stock Actual</th>
+                        <th style="width: 15%;">Retirar</th>
+                        <th style="width: 15%;">Saldo Final</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% if (datos && datos.length > 0) { %>
-                        <% datos.forEach(p => { %>
+                    <% if (datos.length > 0) { %>
+                        <% datos.forEach((p, index) => { %>
                             <tr class="stock-row">
-                                <td style="font-weight: 700; color: var(--negro);"><%= p.producto %></td>
-                                <td style="text-align: center; color: var(--negro);"><%= parseFloat(p.stock_teorico).toFixed(3) %></td>
-                                <td style="text-align: center; color: var(--negro); background: #fdfdfd;"><%= parseFloat(p.stock_fisico).toFixed(3) %></td>
-                                
-                                <!-- DIFERENCIA CON CLASES LIMPIAS -->
-                                <td style="text-align: center;" class="<%= p.diferencia < 0 ? 'diff-neg' : (p.diferencia > 0 ? 'diff-pos' : 'diff-zero') %>">
-                                    <%= p.diferencia > 0 ? '+' : '' %><%= parseFloat(p.diferencia).toFixed(3) %>
+                                <td><%= p.producto %></td>
+                                <td class="text-unidad" style="text-align: center;"><%= p.unidad %></td>
+                                <td class="text-stock" style="text-align: center;">
+                                    <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
                                 </td>
-
-                                <!-- ESTADO CON ETIQUETAS LIMPIAS -->
                                 <td style="text-align: center;">
-                                    <% if (p.diferencia < 0) { %>
-                                        <span class="status-pill pill-rojo">CONSUMO</span>
-                                    <% } else if (p.diferencia > 0) { %>
-                                        <span class="status-pill pill-verde">SOBRANTE</span>
-                                    <% } else { %>
-                                        <span class="status-pill pill-gris">CUADRADO</span>
-                                    <% } %>
+                                    <input type="number" step="any" class="input-fisico" 
+                                           placeholder="0.000"
+                                           data-codigo="<%= p.codigo_general %>"
+                                           data-index="<%= index %>"
+                                           oninput="calcularSaldo(this)">
+                                </td>
+                                <td class="text-saldo" style="text-align: center;">
+                                    <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
-                        <tr><td colspan="5" class="no-data">No hay datos para comparar. Seleccione un almacén.</td></tr>
+                        <tr><td colspan="5" class="no-data">No hay inventario físico reportado en este almacén.</td></tr>
                     <% } %>
                 </tbody>
             </table>
         </div>
-
-        <div class="toolbar-grid" style="grid-template-columns: 1.5fr 1.5fr auto; align-items: flex-end;">
-    <div style="width: 100%;">
-        <label class="label-herramienta">OPERACIÓN / ALMACÉN</label>
-        <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
-            <% almacenesPermitidos.forEach(wh => { %>
-                <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
-            <% }) %>
-        </select>
-    </div>
-
-    <div style="width: 100%;">
-        <label class="label-herramienta">BUSCADOR DE ÍTEMS</label>
-        <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
-    </div>
-
-    <button onclick="confirmarConsumo()" class="btn-bersa btn-rojo" <%= datos.length === 0 ? 'disabled' : '' %>>
-        <i data-lucide="check-square" size="18"></i> CONFIRMAR AJUSTE
-    </button>
-</div>
-
     </div>
 
     <script>
         lucide.createIcons();
+
+        function calcularSaldo(input) {
+            const idx = input.getAttribute('data-index');
+            const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
+            const retiro = parseFloat(input.value) || 0;
+            
+            const total = actual - retiro;
+            const display = document.getElementById(`saldo-${idx}`);
+            display.innerText = total.toFixed(3);
+
+            // Alerta visual si intenta sacar más de lo que hay
+            if (total < 0) {
+                display.classList.add('text-alerta');
+            } else {
+                display.classList.remove('text-alerta');
+            }
+        }
+
+        async function registrarSalidas() {
+            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => parseFloat(i.value) > 0);
+            if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
+
+            const conteos = inputs.map(i => ({
+                codigo: i.getAttribute('data-codigo'),
+                cantidad: parseFloat(i.value) * -1
+            }));
+
+            if(!confirm(`¿Confirmar retiro de ${conteos.length} artículos?`)) return;
+
+            const res = await fetch('/procesar-ajuste', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ almacen: '<%= almacenActivo %>', conteos })
+            });
+
+            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
+            else { alert("❌ Error al guardar."); }
+        }
 
         function filtrarTabla() {
             const val = document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -115,22 +128,6 @@
                 const text = r.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 r.style.display = text.includes(val) ? "" : "none";
             }
-        }
-
-        async function confirmarConsumo() {
-            if(!confirm("⚠️ ¿Desea aplicar los ajustes? Esto igualará el stock del sistema al físico.")) return;
-            const btn = document.querySelector('.btn-rojo');
-            btn.disabled = true; btn.innerText = "PROCESANDO...";
-
-            try {
-                const res = await fetch('/procesar-ajuste', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ almacen: '<%= almacenActivo %>' })
-                });
-                if(res.ok) { alert("✅ Inventario ajustado."); location.reload(); }
-                else { alert("❌ Error."); btn.disabled = false; btn.innerText = "CONFIRMAR AJUSTE"; }
-            } catch(e) { alert("❌ Error de red."); btn.disabled = false; }
         }
     </script>
 </body>

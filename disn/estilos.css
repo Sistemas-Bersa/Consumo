@@ -1,4 +1,3 @@
-/* VARIABLES INSTITUCIONALES */
 :root {
     --azul-bersa: rgb(12, 35, 64);
     --naranja-bersa: rgb(255, 158, 27);
@@ -6,11 +5,11 @@
     --rojo-bersa: rgb(238, 39, 55);
     --blanco: #ffffff;
     --gris-claro: rgba(255, 255, 255, 0.05);
-    --negro: #000000;
-    --verde-exito: #27ae60;
+    --negro: #1a1a1a;
+    --borde-suave: #eeeeee;
 }
 
-/* BASE */
+/* BASE Y CONTENEDOR */
 body {
     background-color: var(--azul-bersa);
     color: var(--blanco);
@@ -42,87 +41,135 @@ body {
     display: flex; align-items: center; justify-content: center;
 }
 
-/* BOTONES */
-.btn-bersa {
-    height: 45px;
-    padding: 0 20px;
+/* BOTÓN INICIO (FONDO BLANCO) */
+.btn-inicio {
+    background-color: var(--blanco);
+    color: var(--azul-bersa);
+    text-decoration: none;
+    padding: 10px 22px;
     border-radius: 8px;
     font-weight: 800;
-    cursor: pointer;
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: 0.3s;
-    border: none;
-    text-decoration: none;
+    border: 1px solid #ddd;
 }
 
-.btn-naranja { background: var(--naranja-bersa); color: var(--azul-bersa); }
-.btn-rojo { background: var(--rojo-bersa); color: white; box-shadow: 0 4px 15px rgba(238, 39, 55, 0.3); }
-.btn-bersa:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
-.btn-bersa:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-inicio:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+}
 
-/* TOOLBAR GRID */
+/* TOOLBAR */
 .toolbar-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1.2fr auto;
-    gap: 15px;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 20px;
     background: rgba(255,255,255,0.03);
     padding: 20px;
     border-radius: 12px;
-    margin-bottom: 25px;
     border: 1px solid rgba(255, 158, 27, 0.2);
+    margin-bottom: 25px;
     align-items: flex-end;
 }
 
+.label-herramienta {
+    color: var(--naranja-bersa);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+
 .search-input {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 158, 27, 0.3);
-    height: 45px;
+    width: 100%; height: 45px;
     padding: 0 15px;
+    background: var(--gris-claro);
+    border: 1px solid rgba(255, 158, 27, 0.2);
     border-radius: 8px;
-}
-
-select.search-input option {
-    background-color: var(--azul-bersa);
     color: white;
+    outline: none;
+    box-sizing: border-box;
 }
 
-
-/* TABLA BLANCA */
+/* TABLA DE PRODUCTOS */
 .table-wrapper { overflow-x: auto; }
-.stock-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-.stock-table th { background: var(--naranja-bersa); color: white; padding: 15px; text-align: left; font-size: 0.8em; text-transform: uppercase; }
-
-.stock-row { background: var(--blanco); color: var(--negro); transition: 0.2s; }
-.stock-row td { padding: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; font-weight: 600; }
-.stock-row td:first-child { border-left: 1px solid #eee; border-radius: 8px 0 0 8px; }
-.stock-row td:last-child { border-right: 1px solid #eee; border-radius: 0 8px 8px 0; }
-
-/* ESTADOS DE DIFERENCIA */
-.diff-neg { color: var(--rojo-bersa); font-weight: 900; }
-.diff-pos { color: var(--verde-exito); font-weight: 900; }
-.diff-zero { color: #95a5a6; }
-
-/* ETIQUETAS DE ESTADO (PILLS) */
-.status-pill {
-    font-size: 0.7em;
-    font-weight: 900;
-    color: #ffffff;
-    padding: 4px 10px;
-    border-radius: 4px;
-    display: inline-block;
+.stock-table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0 10px; 
 }
 
-.pill-rojo { background-color: var(--rojo-bersa); }
-.pill-verde { background-color: var(--verde-exito); }
-.pill-gris { background-color: #95a5a6; }
-
-/* COLORES DE DIFERENCIA */
-.diff-neg { color: var(--rojo-bersa) !important; font-weight: 800; }
-.diff-pos { color: var(--verde-exito) !important; font-weight: 800; }
-.diff-zero { color: #7f8c8d !important; }
-
-/* REGLA PARA TEXTO NEGRO EN TABLA BLANCA */
-.stock-row td {
-    color: var(--negro) !important;
+.stock-table th { 
+    background: var(--naranja-bersa); 
+    color: var(--blanco); 
+    padding: 15px; 
+    text-align: center; 
+    font-size: 0.8em; 
+    text-transform: uppercase;
+    font-weight: 800;
 }
+.stock-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
+.stock-table th:last-child { border-radius: 0 8px 8px 0; }
+
+.stock-row { 
+    background-color: var(--blanco); 
+    transition: 0.2s; 
+}
+.stock-row:hover { background-color: #f9f9f9; transform: scale(1.005); }
+
+.stock-row td { 
+    padding: 15px; 
+    color: var(--negro); 
+    border-top: 1px solid var(--borde-suave); 
+    border-bottom: 1px solid var(--borde-suave); 
+}
+.stock-row td:first-child { 
+    border-left: 1px solid var(--borde-suave); 
+    border-radius: 8px 0 0 8px; 
+    font-weight: 700;
+}
+.stock-row td:last-child { 
+    border-right: 1px solid var(--borde-suave); 
+    border-radius: 0 8px 8px 0; 
+}
+
+/* ELEMENTOS DE LA TABLA */
+.text-unidad { color: var(--naranja-bersa); font-weight: 800; text-transform: uppercase; }
+.text-stock { font-weight: bold; font-size: 1.1em; }
+.text-saldo { font-weight: 900; color: var(--azul-bersa); font-size: 1.2em; }
+.text-alerta { color: var(--rojo-bersa) !important; }
+
+.input-fisico {
+    width: 110px;
+    height: 38px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1em;
+    outline: none;
+}
+.input-fisico:focus { border-color: var(--naranja-bersa); }
+
+/* BOTÓN REGISTRAR */
+.btn-guardar-top {
+    height: 45px;
+    padding: 0 25px;
+    background-color: var(--naranja-bersa);
+    color: var(--azul-bersa);
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.btn-guardar-top:hover { background-color: var(--naranja-hover); transform: translateY(-2px); }
+
+.no-data { text-align: center; padding: 40px; opacity: 0.5; color: white; font-style: italic; }
