@@ -27,20 +27,20 @@ app.get('/', (req, res) => {
 app.get('/consumo', validateUserWithGraph, async (req, res) => {
     try {
         const userEmail = req.user.email.toLowerCase();
-        const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
-        const wh = req.query.wh;
+        const office = (req.user.verifiedOffice || "").toLowerCase();
+        const selectedWh = req.query.wh; 
 
-        // 1. CONSULTA DE ALMACENES PERMITIDOS (Corregido: whQuery definida correctamente)
-        const whQuery = isCorp 
-            ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC' 
+        // 1. Obtener almacenes autorizados
+        const whQuery = office === 'corporativo' 
+            ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC'
             : `SELECT a.clave_sap, a.nombre FROM almacenes a 
                JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
                WHERE LOWER(ua.email) = $1 ORDER BY a.nombre ASC`;
         
-        const whsResult = await pool.query(whQuery, isCorp ? [] : [userEmail]);
-        const activeWh = wh || (whsResult.rows.length > 0 ? whsResult.rows[0].clave_sap : null);
+        const whsResult = await pool.query(whQuery, office === 'corporativo' ? [] : [userEmail]);
+        const activeWh = selectedWh || (whsResult.rows.length > 0 ? whsResult.rows[0].clave_sap : null);
 
-        // 2. CONSULTA DE ITEMS (Corregido: Usando la vista de inventario físico real)
+        // 2. CONSULTA ABIERTA (Muestra todo el catálogo y trae el stock si existe)
         let datos = [];
         if (activeWh) {
             const itemsQuery = `
@@ -50,10 +50,8 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
                     i.tipo AS unidad,
                     COALESCE(v.stock_actual, 0) AS stock_actual
                 FROM items i
-                JOIN items_almacen ia ON i.codigo_articulo = ia.codigo_articulo
                 LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
                     AND v.codigo_almacen = $1
-                WHERE ia.codigo_almacen = $1
                 ORDER BY i.descripcion ASC`;
             
             const resData = await pool.query(itemsQuery, [activeWh]);
@@ -69,7 +67,7 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
 
     } catch (e) { 
         console.error("❌ ERROR EN GET /CONSUMO:", e.stack);
-        res.status(500).send("Error de servidor: " + e.message); 
+        res.status(500).send("Error de servidor"); 
     }
 });
 

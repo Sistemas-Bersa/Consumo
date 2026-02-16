@@ -204,34 +204,24 @@ select.search-input option {
 .input-fisico:focus { border-color: var(--naranja-bersa); }
 
 /* BOTÓN REGISTRAR */
-.btn-guardar-top {
+.btn-registrar-blanco {
     height: 45px;
-    padding: 0 30px;
-    background-color: var(--naranja-bersa);
-    color: var(--azul-bersa); /* Texto azul oscuro para que se vea Pro */
-    border: none;
+    padding: 0 25px;
+    background-color: #ffffff; /* Fondo Blanco */
+    color: var(--azul-bersa);  /* Texto Azul */
+    border: 1px solid #ddd;
     border-radius: 8px;
     font-weight: 800;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    white-space: nowrap; /* Evita que el texto se amontone en dos líneas */
-    width: fit-content;  /* El botón solo mide lo que mide su texto */
+    transition: 0.3s;
+    white-space: nowrap;
 }
 
-.btn-guardar-top:hover {
-    background-color: var(--naranja-hover);
+.btn-registrar-blanco:hover {
+    background-color: #f0f0f0;
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 158, 27, 0.3);
-}
-
-.btn-guardar-top:active {
-    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
