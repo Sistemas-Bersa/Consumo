@@ -8,7 +8,6 @@ const { validateUserWithGraph } = require('./middleware/auth');
 
 const app = express();
 
-// 1. MIDDLEWARES
 app.use(cors({ origin: ['https://bersacloud.app', 'https://consumos.bersacloud.app'], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
@@ -18,9 +17,8 @@ app.set('views', path.join(__dirname, 'visual'));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-// 2. RUTAS
+// RUTAS
 
-// CORRECCIÓN AQUÍ: La lógica debe estar DENTRO de la función (req, res)
 app.get('/', (req, res) => {
     const token = req.query.token;
     if (token) {
@@ -72,31 +70,22 @@ if (activeWh) {
 });
 
 app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
+    const { almacen, conteos } = req.body;
     const client = await pool.connect();
     try {
-        const { almacen } = req.body;
         await client.query('BEGIN');
-
-        const diffs = await client.query(`
-            SELECT codigo_general, diferencia 
-            FROM vista_calculo_consumo 
-            WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) 
-            AND diferencia != 0`, [almacen]);
-
-        for (const row of diffs.rows) {
+        for (const item of conteos) {
             await client.query(
-                'INSERT INTO movimientos_inventario (origen_web, codigo_almacen, codigo_articulo, cantidad_enviada) VALUES ($1, $2, $3, $4)',
-                ['CONSUMO_REAL', almacen, row.codigo_general, row.diferencia]
+                'INSERT INTO inventario_fisico (email_operador, codigo_almacen, codigo_articulo, cantidad_fisica) VALUES ($1, $2, $3, $4)',
+                [req.user.email, almacen, item.codigo, item.cantidad] // Aquí item.cantidad ya viene NEGATIVO desde el front
             );
         }
         await client.query('COMMIT');
         res.json({ success: true });
-    } catch (e) { 
-        await client.query('ROLLBACK'); 
-        console.error("❌ ERROR EN POST /PROCESAR-AJUSTE:", e.stack);
-        res.status(500).json({ error: e.message }); 
-    }
-    finally { client.release(); }
+    } catch (e) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: e.message });
+    } finally { client.release(); }
 });
 
 const PORT = process.env.PORT || 3000;
