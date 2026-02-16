@@ -17,16 +17,25 @@ app.set('views', path.join(__dirname, 'visual'));
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 app.get('/', (req, res) => res.redirect('/consumo'));
+    
+if (req.query.token) {
+        return res.redirect(`/consumo?token=${req.query.token}`);
+    }
+    res.redirect('/consumo');
 
 app.get('/consumo', validateUserWithGraph, async (req, res) => {
-    try {
-        const userEmail = req.user.email;
-        const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
-        const wh = req.query.wh;
+try {
+     const userEmail = req.user.email.toLowerCase(); // Aseguramos minúsculas
+const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
+const wh = req.query.wh;
 
-        // 1. Cargar almacenes autorizados
-        const whQuery = isCorp ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre' :
-            'SELECT a.clave_sap, a.nombre FROM almacenes a JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen WHERE LOWER(ua.email) = $1';
+const whQuery = isCorp 
+    ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre' 
+    : `SELECT a.clave_sap, a.nombre 
+       FROM almacenes a 
+       JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
+       WHERE LOWER(ua.email) = $1 
+       ORDER BY a.nombre`;
         const whs = await pool.query(whQuery, isCorp ? [] : [userEmail]);
 
         const activeWh = wh || (whs.rows.length > 0 ? whs.rows[0].clave_sap : null);
