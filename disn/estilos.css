@@ -1,3 +1,4 @@
+/* VARIABLES INSTITUCIONALES */
 :root {
     --azul-bersa: rgb(12, 35, 64);
     --naranja-bersa: rgb(255, 158, 27);
@@ -6,14 +7,13 @@
     --blanco: #ffffff;
     --gris-claro: rgba(255, 255, 255, 0.05);
     --negro: #1a1a1a;
-    --borde-suave: #eeeeee;
 }
 
-/* BASE Y CONTENEDOR */
+/* BASE */
 body {
     background-color: var(--azul-bersa);
     color: var(--blanco);
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     margin: 0; padding: 0;
 }
 
@@ -33,59 +33,46 @@ body {
     margin-bottom: 25px;
 }
 
-.brand { display: flex; align-items: center; gap: 15px; }
-.brand-icon {
-    width: 40px; height: 40px;
-    background: var(--naranja-bersa);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-}
-
-/* BOTÓN INICIO (FONDO BLANCO) */
-.btn-inicio {
+/* BOTONES BLANCOS (INICIO Y REGISTRO) */
+.btn-blanco {
     background-color: var(--blanco);
     color: var(--azul-bersa);
     text-decoration: none;
-    padding: 10px 22px;
+    padding: 0 25px;
+    height: 45px;
     border-radius: 8px;
     font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transition: 0.3s;
     border: 1px solid #ddd;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-.btn-inicio:hover {
+.btn-blanco:hover {
     background-color: #f0f0f0;
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* TOOLBAR */
-.toolbar-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto; 
-    gap: 20px; 
+/* TOOLBAR - FLEXBOX PARA EVITAR TRASLAPES */
+.toolbar-flex {
+    display: flex;
+    gap: 20px;
     background: rgba(255, 255, 255, 0.03);
-    padding: 20px;
+    padding: 25px;
     border-radius: 12px;
     border: 1px solid rgba(255, 158, 27, 0.2);
-    margin-bottom: 25px;
-    align-items: flex-end; 
+    margin-bottom: 30px;
+    align-items: flex-end;
 }
 
 .toolbar-item {
-    width: 100%;
+    flex: 1; /* Esto hace que el buscador y el selector crezcan */
     display: flex;
     flex-direction: column;
-}
-
-
-.text-unidad {
-    color: var(--naranja-bersa) !important;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 0.9em;
 }
 
 .label-herramienta {
@@ -93,143 +80,51 @@ body {
     font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
-    display: block;
     margin-bottom: 8px;
-}
-
-select.search-input {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
-    cursor: pointer;
-    appearance: auto !important; 
-}
-
-select.search-input option {
-    background-color: var(--azul-bersa) !important;
-    color: white !important;
-    padding: 10px;
 }
 
 .search-input {
     width: 100%;
     height: 45px;
     padding: 0 15px;
-    background-color: rgba(255, 255, 255, 0.05); /* Fondo oscuro semi-transparente */
-    color: #ffffff !important; /* Texto blanco siempre */
-    border: 1px solid rgba(255, 158, 27, 0.3); /* Borde naranja sutil */
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: 1px solid rgba(255, 158, 27, 0.3);
     border-radius: 8px;
     outline: none;
-    font-size: 0.95em;
-    transition: all 0.3s ease;
 }
 
-/* Efecto cuando haces clic para escribir */
-.search-input:focus {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: var(--naranja-bersa);
-    box-shadow: 0 0 10px rgba(255, 158, 27, 0.2);
-}
-
-/* Color del texto de sugerencia (Placeholder) */
-.search-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-    font-style: italic;
-}
-
-/* Para los Selects (Almacén) */
-select.search-input {
-    cursor: pointer;
-}
-
-select.search-input option {
-    background-color: var(--azul-bersa); /* Fondo de las opciones igual al fondo web */
-    color: white;
-}
-
-/* TABLA DE PRODUCTOS */
-.table-wrapper { overflow-x: auto; }
+/* TABLA BLANCA */
 .stock-table { 
     width: 100%; 
     border-collapse: separate; 
     border-spacing: 0 10px; 
 }
-
 .stock-table th { 
     background: var(--naranja-bersa); 
-    color: var(--blanco); 
+    color: white; 
     padding: 15px; 
-    text-align: center; 
     font-size: 0.8em; 
     text-transform: uppercase;
-    font-weight: 800;
 }
-.stock-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
-.stock-table th:last-child { border-radius: 0 8px 8px 0; }
 
-.stock-row { 
-    background-color: var(--blanco); 
-    transition: 0.2s; 
-}
-.stock-row:hover { background-color: #f9f9f9; transform: scale(1.005); }
-
+.stock-row { background-color: var(--blanco); }
 .stock-row td { 
     padding: 15px; 
     color: var(--negro); 
-    border-top: 1px solid var(--borde-suave); 
-    border-bottom: 1px solid var(--borde-suave); 
-}
-.stock-row td:first-child { 
-    border-left: 1px solid var(--borde-suave); 
-    border-radius: 8px 0 0 8px; 
-    font-weight: 700;
-}
-.stock-row td:last-child { 
-    border-right: 1px solid var(--borde-suave); 
-    border-radius: 0 8px 8px 0; 
+    border-top: 1px solid #eee; 
+    border-bottom: 1px solid #eee; 
 }
 
-.stock-row td span {
-    color: var(--negro);
+/* COLUMNAS SANS-SERIF GRUESAS */
+.text-bold-negro { 
+    font-weight: 800; 
+    color: var(--azul-bersa); 
+}
+.text-bold-naranja { 
+    font-weight: 700; 
+    color: var(--naranja-bersa); 
+    text-transform: uppercase;
 }
 
-/* ELEMENTOS DE LA TABLA */
-.text-unidad { color: var(--naranja-bersa); font-weight: 800; text-transform: uppercase; }
-.text-stock { font-weight: bold; font-size: 1.1em; }
-.text-saldo { font-weight: 900; color: var(--azul-bersa); font-size: 1.2em; }
-.text-alerta { color: var(--rojo-bersa) !important; }
-
-.input-fisico {
-    width: 110px;
-    height: 38px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1em;
-    outline: none;
-}
-.input-fisico:focus { border-color: var(--naranja-bersa); }
-
-/* BOTÓN REGISTRAR */
-.btn-registrar-blanco {
-    height: 45px;
-    padding: 0 25px;
-    background-color: var(--naranja-bersa);
-    color: var(--azul-bersa);
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-weight: 800;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: 0.3s;
-    white-space: nowrap; /* Evita que el texto se rompa */
-    width: fit-content;  /* Solo mide lo necesario */
-}
-
-.btn-registrar-blanco:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+.text-alerta { color: var(--rojo-bersa) !important; font-weight: 900; }

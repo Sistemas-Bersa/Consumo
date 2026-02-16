@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salida de Inventario | Bersa</title>
+    <title>Consumo | Bersa Cloud</title>
     <link rel="stylesheet" href="/estilos.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -13,65 +13,58 @@
         <header class="header-top">
             <div class="brand">
                 <div class="brand-icon"><i data-lucide="minus-circle" style="color: var(--azul-bersa)"></i></div>
-                <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
+                <h1 style="margin:0">Módulo <span style="color: var(--naranja-bersa)">Consumo</span></h1>
             </div>
-            <a href="https://bersacloud.app" class="btn-inicio">
+            <a href="https://bersacloud.app" class="btn-blanco">
                 <i data-lucide="home" size="18"></i> INICIO
             </a>
         </header>
 
-        <!-- TOOLBAR ÚNICA -->
-   <div class="toolbar-grid">
-    
-    <div class="toolbar-item">
-        <label class="label-herramienta">ALMACÉN</label>
-        <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
-            <% almacenesPermitidos.forEach(wh => { %>
-                <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
-            <% }) %>
-        </select>
-    </div>
-
-    <div class="toolbar-item">
-        <label class="label-herramienta">BUSCAR PRODUCTO</label>
-        <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
-    </div>
-    
-    <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-        <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
-    </button>
-
-</div>
+        <!-- TOOLBAR CON FLEXBOX -->
+        <div class="toolbar-flex">
+            <div class="toolbar-item">
+                <label class="label-herramienta">ALMACÉN</label>
+                <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+                    <% almacenesPermitidos.forEach(wh => { %>
+                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="toolbar-item">
+                <label class="label-herramienta">BUSCAR PRODUCTO</label>
+                <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+            </div>
+            <button onclick="registrarSalidas()" class="btn-blanco">
+                <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
+            </button>
+        </div>
 
         <!-- TABLA -->
         <div class="table-wrapper">
             <table class="stock-table" id="tablaStock">
                 <thead>
                     <tr>
-                        <th style="width: 40%;">Producto / Descripción</th>
-                        <th style="text-align: center;">Unidad</th>
-                        <th style="text-align: center;">Stock Actual</th>
-                        <th style="text-align: center;">Retirar</th>
-                        <th style="text-align: center;">Saldo Final</th>
+                        <th style="text-align: left; border-radius: 8px 0 0 8px;">Producto</th>
+                        <th>Unidad</th>
+                        <th>Stock Actual</th>
+                        <th>Retirar</th>
+                        <th style="border-radius: 0 8px 8px 0;">Saldo Final</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% if (datos.length > 0) { %>
                         <% datos.forEach((p, index) => { %>
-                            <% 
-                                // Detectamos si es pieza para bloquear decimales
-                                const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA') || (p.unidad || '').toUpperCase().includes('PZ');
-                            %>
+                            <% const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA'); %>
                             <tr class="stock-row">
-                                <td style="font-weight: 700;"><%= p.producto %></td>
-                                <td class="text-unidad" style="text-align: center;"><%= p.unidad || 'PIEZA' %></td>
-                                <td class="text-stock" style="text-align: center;">
-                                    <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
+                                <td class="text-bold-negro"><%= p.producto %></td>
+                                <td class="text-bold-naranja" style="text-align: center;"><%= p.unidad %></td>
+                                <td style="text-align: center; font-weight: bold;">
+                                    <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
                                 <td style="text-align: center;">
                                     <input type="number" 
-                                           step="<%= esPieza ? '1' : 'any' %>" 
                                            class="input-fisico" 
+                                           step="<%= esPieza ? '1' : 'any' %>" 
                                            placeholder="<%= esPieza ? '0' : '0.000' %>"
                                            data-codigo="<%= p.codigo_general %>"
                                            data-index="<%= index %>"
@@ -79,13 +72,13 @@
                                            onkeypress="return validarTecla(event, this)"
                                            oninput="calcularSaldo(this)">
                                 </td>
-                                <td class="text-saldo" style="text-align: center;">
-                                    <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
+                                <td style="text-align: center; font-weight: 900; color: var(--azul-bersa);">
+                                    <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
-                        <tr><td colspan="5" class="no-data">No hay inventario físico reportado en este almacén.</td></tr>
+                        <tr><td colspan="5" class="no-data">No hay datos disponibles.</td></tr>
                     <% } %>
                 </tbody>
             </table>
@@ -95,7 +88,6 @@
     <script>
         lucide.createIcons();
 
-        // Bloqueo de decimales para piezas
         function validarTecla(event, input) {
             const esPieza = input.getAttribute('data-es-pieza') === 'true';
             if (!esPieza) return true;
@@ -106,48 +98,29 @@
 
         function calcularSaldo(input) {
             const idx = input.getAttribute('data-index');
-            const esPieza = input.getAttribute('data-es-pieza') === 'true';
-            
-            if(esPieza) input.value = input.value.replace(/[^0-9]/g, '');
-
             const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
             const retiro = parseFloat(input.value) || 0;
-            
             const total = actual - retiro;
             const display = document.getElementById(`saldo-${idx}`);
             display.innerText = total.toFixed(3);
-
-            if (total < 0) {
-                display.classList.add('text-alerta');
-            } else {
-                display.classList.remove('text-alerta');
-            }
+            display.className = total < 0 ? 'text-alerta' : '';
         }
 
         async function registrarSalidas() {
-            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => parseFloat(i.value) > 0);
-            if(inputs.length === 0) return alert("⚠️ Ingrese cantidades a retirar.");
-
+            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => i.value > 0);
+            if(inputs.length === 0) return alert("Ingrese cantidades.");
             const conteos = inputs.map(i => ({
                 codigo: i.getAttribute('data-codigo'),
-                cantidad: parseFloat(i.value) * -1 // SE ENVÍA NEGATIVO A SQL
+                cantidad: parseFloat(i.value) * -1
             }));
-
-            if(!confirm(`¿Confirmar retiro de ${conteos.length} artículos?`)) return;
-
+            if(!confirm("¿Confirmar retiro?")) return;
             const res = await fetch('/procesar-ajuste', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ almacen: '<%= almacenActivo %>', conteos })
             });
-
-            if (res.ok) { 
-                alert("✅ Consumo registrado correctamente."); 
-                location.reload(); 
-            } else { 
-                const err = await res.json();
-                alert("❌ Error: " + (err.error || "No se pudo guardar.")); 
-            }
+            if (res.ok) { alert("✅ Éxito"); location.reload(); }
+            else { alert("❌ Error"); }
         }
 
         function filtrarTabla() {
