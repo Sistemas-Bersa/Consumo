@@ -7,7 +7,9 @@ const cors = require('cors');
 const { validateUserWithGraph } = require('./middleware/auth');
 
 const app = express();
-app.use(cors({ origin: ['https://bersacloud.app', 'https://consumo.bersacloud.app'], credentials: true }));
+
+// 1. MIDDLEWARES
+app.use(cors({ origin: ['https://bersacloud.app', 'https://consumos.bersacloud.app'], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'disn')));
@@ -16,40 +18,56 @@ app.set('views', path.join(__dirname, 'visual'));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-app.get('/', (req, res) => res.redirect('/consumo'));
-    
-if (req.query.token) {
-        return res.redirect(`/consumo?token=${req.query.token}`);
+// 2. RUTAS
+
+// CORRECCIÓN AQUÍ: La lógica debe estar DENTRO de la función (req, res)
+app.get('/', (req, res) => {
+    const token = req.query.token;
+    if (token) {
+        return res.redirect(`/consumo?token=${token}`);
     }
     res.redirect('/consumo');
+});
 
 app.get('/consumo', validateUserWithGraph, async (req, res) => {
-try {
-     const userEmail = req.user.email.toLowerCase(); // Aseguramos minúsculas
-const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
-const wh = req.query.wh;
+    try {
+        const userEmail = req.user.email.toLowerCase();
+        const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
+        const wh = req.query.wh;
 
-const whQuery = isCorp 
-    ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre' 
-    : `SELECT a.clave_sap, a.nombre 
-       FROM almacenes a 
-       JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
-       WHERE LOWER(ua.email) = $1 
-       ORDER BY a.nombre`;
+        // Cargar almacenes
+        const whQuery = isCorp 
+            ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC' 
+            : `SELECT a.clave_sap, a.nombre 
+               FROM almacenes a 
+               JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
+               WHERE LOWER(ua.email) = $1 
+               ORDER BY a.nombre ASC`;
+        
         const whs = await pool.query(whQuery, isCorp ? [] : [userEmail]);
-
         const activeWh = wh || (whs.rows.length > 0 ? whs.rows[0].clave_sap : null);
 
-        // 2. Cargar comparativa desde la vista
         let datos = [];
         if (activeWh) {
-            const dataQuery = 'SELECT * FROM vista_calculo_consumo WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) ORDER BY producto';
+            const dataQuery = `
+                SELECT * FROM vista_calculo_consumo 
+                WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) 
+                ORDER BY producto ASC`;
             const resData = await pool.query(dataQuery, [activeWh]);
             datos = resData.rows;
         }
 
-        res.render('consumo', { datos, usuario: req.user, almacenesPermitidos: whs.rows, almacenActivo: activeWh });
-    } catch (e) { res.status(500).send("Error de servidor"); }
+        res.render('consumo', { 
+            datos, 
+            usuario: req.user, 
+            almacenesPermitidos: whs.rows, 
+            almacenActivo: activeWh 
+        });
+
+    } catch (e) { 
+        console.error("❌ ERROR EN GET /CONSUMO:", e.stack);
+        res.status(500).send("Error de servidor: " + e.message); 
+    }
 });
 
 app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
@@ -58,16 +76,27 @@ app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
         const { almacen } = req.body;
         await client.query('BEGIN');
 
-        const diffs = await client.query('SELECT codigo_general, diferencia FROM vista_calculo_consumo WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) AND diferencia != 0', [almacen]);
+        const diffs = await client.query(`
+            SELECT codigo_general, diferencia 
+            FROM vista_calculo_consumo 
+            WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) 
+            AND diferencia != 0`, [almacen]);
 
         for (const row of diffs.rows) {
-            await client.query('INSERT INTO movimientos_inventario (origen_web, codigo_almacen, codigo_articulo, cantidad_enviada) VALUES ($1, $2, $3, $4)',
-                ['CONSUMO_REAL', almacen, row.codigo_general, row.diferencia]);
+            await client.query(
+                'INSERT INTO movimientos_inventario (origen_web, codigo_almacen, codigo_articulo, cantidad_enviada) VALUES ($1, $2, $3, $4)',
+                ['CONSUMO_REAL', almacen, row.codigo_general, row.diferencia]
+            );
         }
         await client.query('COMMIT');
         res.json({ success: true });
-    } catch (e) { await client.query('ROLLBACK'); res.status(500).json({ error: e.message }); }
+    } catch (e) { 
+        await client.query('ROLLBACK'); 
+        console.error("❌ ERROR EN POST /PROCESAR-AJUSTE:", e.stack);
+        res.status(500).json({ error: e.message }); 
+    }
     finally { client.release(); }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("🚀 Web Consumo Lista"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Web Consumo activa en puerto ${PORT}`));
