@@ -83,17 +83,19 @@ body {
     margin-bottom: 8px;
 }
 
-.search-input {
-    width: 100%; height: 45px;
-    padding: 0 15px;
-    background: var(--gris-claro);
-    border: 1px solid rgba(255, 158, 27, 0.2);
-    border-radius: 8px;
-    color: white;
-    outline: none;
-    box-sizing: border-box;
+select.search-input {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    cursor: pointer;
+    appearance: auto !important; /* Devuelve la flecha normal para evitar errores visuales */
 }
 
+/* Esto asegura que las opciones de adentro se vean en el azul de Bersa */
+select.search-input option {
+    background-color: var(--azul-bersa) !important;
+    color: white !important;
+    padding: 10px;
+}
 /* TABLA DE PRODUCTOS */
 .table-wrapper { overflow-x: auto; }
 .stock-table { 
