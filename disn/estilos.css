@@ -64,13 +64,13 @@ body {
 /* TOOLBAR */
 .toolbar-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 20px;
-    background: rgba(255,255,255,0.03);
-    padding: 20px;
+    grid-template-columns: 1fr 1fr auto; /* Mantenemos el botón a su ancho de contenido */
+    gap: 25px; /* Aumentamos el espacio entre columnas */
+    background: rgba(255, 255, 255, 0.03);
+    padding: 25px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 158, 27, 0.2);
-    margin-bottom: 25px;
+    border: 1px solid rgba(255, 158, 27, 0.15);
+    margin-bottom: 30px;
     align-items: flex-end;
 }
 
@@ -208,17 +208,38 @@ select.search-input option {
     height: 45px;
     padding: 0 25px;
     background-color: var(--naranja-bersa);
-    color: var(--azul-bersa);
+    color: var(--azul-bersa); /* Texto oscuro para máxima legibilidad */
     border: none;
     border-radius: 8px;
     font-weight: 800;
+    font-size: 0.85rem; /* Un poco más pequeño para que se vea más pro */
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: 0.2s;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
 }
-.btn-guardar-top:hover { background-color: var(--naranja-hover); transform: translateY(-2px); }
 
-.no-data { text-align: center; padding: 40px; opacity: 0.5; color: white; font-style: italic; }
+.btn-guardar-top:hover {
+    background-color: var(--naranja-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 158, 27, 0.3);
+}
+
+.btn-guardar-top:active {
+    transform: translateY(0);
+}
+
+/* Estilo para el icono dentro del botón */
+.btn-guardar-top i {
+    transition: transform 0.3s ease;
+}
+
+.btn-guardar-top:hover i {
+    transform: translateX(3px) rotate(-10deg); /* Pequeña animación al avioncito */
+}
