@@ -21,25 +21,27 @@
         </header>
 
         <!-- TOOLBAR ÚNICA -->
-       <div class="toolbar-grid">
-            <div class="toolbar-item">
-                <label class="label-herramienta">ALMACÉN</label>
-                <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
-                    <% almacenesPermitidos.forEach(wh => { %>
-                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
-                    <% }) %>
-                </select>
-            </div>
-            <div class="toolbar-item">
-                <label class="label-herramienta">BUSCAR PRODUCTO</label>
-                <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
-            </div>
-            
-            <!-- BOTÓN AHORA ES BLANCO Y TIENE SU ESPACIO -->
-            <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-                <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
-            </button>
-        </div>
+   <div class="toolbar-grid">
+    
+    <div class="toolbar-item">
+        <label class="label-herramienta">ALMACÉN</label>
+        <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+            <% almacenesPermitidos.forEach(wh => { %>
+                <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+            <% }) %>
+        </select>
+    </div>
+
+    <div class="toolbar-item">
+        <label class="label-herramienta">BUSCAR PRODUCTO</label>
+        <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+    </div>
+    
+    <button onclick="registrarSalidas()" class="btn-registrar-blanco">
+        <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
+    </button>
+
+</div>
 
         <!-- TABLA -->
         <div class="table-wrapper">
