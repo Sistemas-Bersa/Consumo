@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo | Bersa Cloud</title>
+    <link rel="stylesheet" href="/estilos.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header-top">
+            <div class="brand">
+                <div class="brand-icon"><i data-lucide="layout-list" style="color: var(--azul-bersa)"></i></div>
+                <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
+            </div>
+            <a href="https://bersacloud.app" class="btn-bersa btn-naranja">
+                <i data-lucide="home" size="18"></i> INICIO
+            </a>
+        </header>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar-grid">
+            <div>
+                <label class="label-herramienta">ALMACÉN</label>
+                <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+                    <% almacenesPermitidos.forEach(wh => { %>
+                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div>
+                <label class="label-herramienta">BUSCAR ARTÍCULO</label>
+                <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+            </div>
+            <button onclick="confirmarConsumo()" class="btn-bersa btn-rojo" <%= datos.length === 0 ? 'disabled' : '' %>>
+                <i data-lucide="check-square" size="18"></i> CONFIRMAR AJUSTE
+            </button>
+        </div>
+
+        <!-- TABLA COMPARATIVA -->
+        <div class="table-wrapper">
+            <table class="stock-table" id="tablaStock">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Producto</th>
+                        <th style="text-align: center;">Teórico</th>
+                        <th style="text-align: center;">Físico</th>
+                        <th style="text-align: center;">Diferencia</th>
+                        <th style="text-align: center;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (datos && datos.length > 0) { %>
+                        <% datos.forEach(p => { %>
+                            <tr class="stock-row">
+                                <td style="font-weight: 700; color: var(--negro);"><%= p.producto %></td>
+                                <td style="text-align: center; color: var(--negro);"><%= parseFloat(p.stock_teorico).toFixed(3) %></td>
+                                <td style="text-align: center; color: var(--negro); background: #fdfdfd;"><%= parseFloat(p.stock_fisico).toFixed(3) %></td>
+                                
+                                <!-- DIFERENCIA CON CLASES LIMPIAS -->
+                                <td style="text-align: center;" class="<%= p.diferencia < 0 ? 'diff-neg' : (p.diferencia > 0 ? 'diff-pos' : 'diff-zero') %>">
+                                    <%= p.diferencia > 0 ? '+' : '' %><%= parseFloat(p.diferencia).toFixed(3) %>
+                                </td>
+
+                                <!-- ESTADO CON ETIQUETAS LIMPIAS -->
+                                <td style="text-align: center;">
+                                    <% if (p.diferencia < 0) { %>
+                                        <span class="status-pill pill-rojo">CONSUMO</span>
+                                    <% } else if (p.diferencia > 0) { %>
+                                        <span class="status-pill pill-verde">SOBRANTE</span>
+                                    <% } else { %>
+                                        <span class="status-pill pill-gris">CUADRADO</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="no-data">No hay datos para comparar. Seleccione un almacén.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function filtrarTabla() {
+            const val = document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const rows = document.getElementsByClassName("stock-row");
+            for (let r of rows) {
+                const text = r.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                r.style.display = text.includes(val) ? "" : "none";
+            }
+        }
+
+        async function confirmarConsumo() {
+            if(!confirm("⚠️ ¿Desea aplicar los ajustes? Esto igualará el stock del sistema al físico.")) return;
+            const btn = document.querySelector('.btn-rojo');
+            btn.disabled = true; btn.innerText = "PROCESANDO...";
+
+            try {
+                const res = await fetch('/procesar-ajuste', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ almacen: '<%= almacenActivo %>' })
+                });
+                if(res.ok) { alert("✅ Inventario ajustado."); location.reload(); }
+                else { alert("❌ Error."); btn.disabled = false; btn.innerText = "CONFIRMAR AJUSTE"; }
+            } catch(e) { alert("❌ Error de red."); btn.disabled = false; }
+        }
+    </script>
+</body>
+</html>
