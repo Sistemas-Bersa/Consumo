@@ -45,26 +45,34 @@
                 <thead>
                     <tr>
                         <th style="width: 40%;">Producto / Descripción</th>
-                        <th style="width: 15%;">Unidad</th>
-                        <th style="width: 15%;">Stock Actual</th>
-                        <th style="width: 15%;">Retirar</th>
-                        <th style="width: 15%;">Saldo Final</th>
+                        <th style="text-align: center;">Unidad</th>
+                        <th style="text-align: center;">Stock Actual</th>
+                        <th style="text-align: center;">Retirar</th>
+                        <th style="text-align: center;">Saldo Final</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% if (datos.length > 0) { %>
                         <% datos.forEach((p, index) => { %>
+                            <% 
+                                // Detectamos si es pieza para bloquear decimales
+                                const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA') || (p.unidad || '').toUpperCase().includes('PZ');
+                            %>
                             <tr class="stock-row">
                                 <td style="font-weight: 700;"><%= p.producto %></td>
-                                <td class="text-unidad" style="text-align: center;"><%= p.unidad || 'PZ' %></td>
+                                <td class="text-unidad" style="text-align: center;"><%= p.unidad || 'PIEZA' %></td>
                                 <td class="text-stock" style="text-align: center;">
                                     <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <input type="number" step="any" class="input-fisico" 
-                                           placeholder="0.000"
+                                    <input type="number" 
+                                           step="<%= esPieza ? '1' : 'any' %>" 
+                                           class="input-fisico" 
+                                           placeholder="<%= esPieza ? '0' : '0.000' %>"
                                            data-codigo="<%= p.codigo_general %>"
                                            data-index="<%= index %>"
+                                           data-es-pieza="<%= esPieza %>"
+                                           onkeypress="return validarTecla(event, this)"
                                            oninput="calcularSaldo(this)">
                                 </td>
                                 <td class="text-saldo" style="text-align: center;">
@@ -83,8 +91,21 @@
     <script>
         lucide.createIcons();
 
+        // Bloqueo de decimales para piezas
+        function validarTecla(event, input) {
+            const esPieza = input.getAttribute('data-es-pieza') === 'true';
+            if (!esPieza) return true;
+            const charCode = (event.which) ? event.which : event.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+            return true;
+        }
+
         function calcularSaldo(input) {
             const idx = input.getAttribute('data-index');
+            const esPieza = input.getAttribute('data-es-pieza') === 'true';
+            
+            if(esPieza) input.value = input.value.replace(/[^0-9]/g, '');
+
             const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
             const retiro = parseFloat(input.value) || 0;
             
@@ -101,11 +122,11 @@
 
         async function registrarSalidas() {
             const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => parseFloat(i.value) > 0);
-            if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
+            if(inputs.length === 0) return alert("⚠️ Ingrese cantidades a retirar.");
 
             const conteos = inputs.map(i => ({
                 codigo: i.getAttribute('data-codigo'),
-                cantidad: parseFloat(i.value) * -1 // SE ENVÍA NEGATIVO
+                cantidad: parseFloat(i.value) * -1 // SE ENVÍA NEGATIVO A SQL
             }));
 
             if(!confirm(`¿Confirmar retiro de ${conteos.length} artículos?`)) return;
@@ -116,8 +137,13 @@
                 body: JSON.stringify({ almacen: '<%= almacenActivo %>', conteos })
             });
 
-            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
-            else { alert("❌ Error al guardar."); }
+            if (res.ok) { 
+                alert("✅ Consumo registrado correctamente."); 
+                location.reload(); 
+            } else { 
+                const err = await res.json();
+                alert("❌ Error: " + (err.error || "No se pudo guardar.")); 
+            }
         }
 
         function filtrarTabla() {

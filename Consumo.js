@@ -7,6 +7,7 @@ const cors = require('cors');
 const { validateUserWithGraph } = require('./middleware/auth');
 
 const app = express();
+
 app.use(cors({ origin: ['https://bersacloud.app', 'https://consumos.bersacloud.app'], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
@@ -16,6 +17,7 @@ app.set('views', path.join(__dirname, 'visual'));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
+// RUTAS
 app.get('/', (req, res) => {
     const token = req.query.token;
     if (token) return res.redirect(`/consumo?token=${token}`);
@@ -28,41 +30,45 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
         const wh = req.query.wh;
 
-        // 1. OBTENER ALMACENES (Corregido: nombre de variable whQuery)
+        // 1. CONSULTA DE ALMACENES PERMITIDOS (Corregido: whQuery definida correctamente)
         const whQuery = isCorp 
             ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC' 
             : `SELECT a.clave_sap, a.nombre FROM almacenes a 
                JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
                WHERE LOWER(ua.email) = $1 ORDER BY a.nombre ASC`;
         
-        const whs = await pool.query(whQuery, isCorp ? [] : [userEmail]);
-        const activeWh = wh || (whs.rows.length > 0 ? whs.rows[0].clave_sap : null);
+        const whsResult = await pool.query(whQuery, isCorp ? [] : [userEmail]);
+        const activeWh = wh || (whsResult.rows.length > 0 ? whsResult.rows[0].clave_sap : null);
 
-        // 2. CONSULTA DE STOCK ACTUAL (Desde la vista de Inventario Físico)
+        // 2. CONSULTA DE ITEMS (Corregido: Usando la vista de inventario físico real)
         let datos = [];
         if (activeWh) {
-            const dataQuery = `
+            const itemsQuery = `
                 SELECT 
-                    producto, 
-                    codigo_general, 
-                    unidad,
-                    COALESCE(stock_actual, 0) as stock_actual 
-                FROM vista_inventario_fisico_real 
-                WHERE codigo_almacen = $1 
-                ORDER BY producto ASC`;
-            const resData = await pool.query(dataQuery, [activeWh]);
+                    i.descripcion AS producto, 
+                    i.codigo_articulo AS codigo_general, 
+                    i.tipo AS unidad,
+                    COALESCE(v.stock_actual, 0) AS stock_actual
+                FROM items i
+                JOIN items_almacen ia ON i.codigo_articulo = ia.codigo_articulo
+                LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
+                    AND v.codigo_almacen = $1
+                WHERE ia.codigo_almacen = $1
+                ORDER BY i.descripcion ASC`;
+            
+            const resData = await pool.query(itemsQuery, [activeWh]);
             datos = resData.rows;
         }
 
         res.render('consumo', { 
             datos, 
             usuario: req.user, 
-            almacenesPermitidos: whs.rows, 
+            almacenesPermitidos: whsResult.rows, 
             almacenActivo: activeWh 
         });
 
     } catch (e) { 
-        console.error("❌ ERROR EN CONSUMO:", e.stack);
+        console.error("❌ ERROR EN GET /CONSUMO:", e.stack);
         res.status(500).send("Error de servidor: " + e.message); 
     }
 });
@@ -82,6 +88,7 @@ app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
         res.json({ success: true });
     } catch (e) {
         await client.query('ROLLBACK');
+        console.error("❌ ERROR EN POST:", e.message);
         res.status(500).json({ error: e.message });
     } finally { client.release(); }
 });

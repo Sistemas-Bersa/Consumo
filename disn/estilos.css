@@ -65,13 +65,13 @@ body {
 .toolbar-grid {
     display: grid;
     grid-template-columns: 1fr 1fr auto; 
-    gap: 25px; 
+    gap: 20px; 
     background: rgba(255, 255, 255, 0.03);
     padding: 25px;
     border-radius: 12px;
     border: 1px solid rgba(255, 158, 27, 0.15);
     margin-bottom: 30px;
-    align-items: flex-end;
+    align-items: flex-end; 
 }
 
 .text-unidad {
@@ -206,40 +206,32 @@ select.search-input option {
 /* BOTÓN REGISTRAR */
 .btn-guardar-top {
     height: 45px;
-    padding: 0 25px;
+    padding: 0 30px;
     background-color: var(--naranja-bersa);
-    color: var(--azul-bersa); /* Texto oscuro para máxima legibilidad */
+    color: var(--azul-bersa); /* Texto azul oscuro para que se vea Pro */
     border: none;
     border-radius: 8px;
     font-weight: 800;
-    font-size: 0.85rem; /* Un poco más pequeño para que se vea más pro */
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    white-space: nowrap; /* Evita que el texto se amontone en dos líneas */
+    width: fit-content;  /* El botón solo mide lo que mide su texto */
 }
 
 .btn-guardar-top:hover {
     background-color: var(--naranja-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(255, 158, 27, 0.3);
+    box-shadow: 0 6px 15px rgba(255, 158, 27, 0.3);
 }
 
 .btn-guardar-top:active {
     transform: translateY(0);
-}
-
-/* Estilo para el icono dentro del botón */
-.btn-guardar-top i {
-    transition: transform 0.3s ease;
-}
-
-.btn-guardar-top:hover i {
-    transform: translateX(3px) rotate(-10deg); /* Pequeña animación al avioncito */
 }
