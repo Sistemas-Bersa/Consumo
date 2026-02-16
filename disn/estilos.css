@@ -64,8 +64,8 @@ body {
 /* TOOLBAR */
 .toolbar-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr auto; /* Mantenemos el botón a su ancho de contenido */
-    gap: 25px; /* Aumentamos el espacio entre columnas */
+    grid-template-columns: 1fr 1fr auto; 
+    gap: 25px; 
     background: rgba(255, 255, 255, 0.03);
     padding: 25px;
     border-radius: 12px;
