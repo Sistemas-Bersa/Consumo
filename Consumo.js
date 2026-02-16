@@ -47,15 +47,16 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         const whs = await pool.query(whQuery, isCorp ? [] : [userEmail]);
         const activeWh = wh || (whs.rows.length > 0 ? whs.rows[0].clave_sap : null);
 
-        let datos = [];
-        if (activeWh) {
-            const dataQuery = `
-                SELECT * FROM vista_calculo_consumo 
-                WHERE almacen = (SELECT nombre FROM almacenes WHERE clave_sap = $1) 
-                ORDER BY producto ASC`;
-            const resData = await pool.query(dataQuery, [activeWh]);
-            datos = resData.rows;
-        }
+     let datos = [];
+if (activeWh) {
+    const dataQuery = `
+        SELECT * FROM vista_calculo_consumo 
+        WHERE codigo_almacen = $1 
+        AND (stock_teorico != 0 OR stock_fisico != 0) -- Solo mostramos lo que tenga algo de info
+        ORDER BY producto ASC`;
+    const resData = await pool.query(dataQuery, [activeWh]);
+    datos = resData.rows;
+}
 
         res.render('consumo', { 
             datos, 

@@ -82,6 +82,27 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="toolbar-grid" style="grid-template-columns: 1.5fr 1.5fr auto; align-items: flex-end;">
+    <div style="width: 100%;">
+        <label class="label-herramienta">OPERACIÓN / ALMACÉN</label>
+        <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+            <% almacenesPermitidos.forEach(wh => { %>
+                <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+            <% }) %>
+        </select>
+    </div>
+
+    <div style="width: 100%;">
+        <label class="label-herramienta">BUSCADOR DE ÍTEMS</label>
+        <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+    </div>
+
+    <button onclick="confirmarConsumo()" class="btn-bersa btn-rojo" <%= datos.length === 0 ? 'disabled' : '' %>>
+        <i data-lucide="check-square" size="18"></i> CONFIRMAR AJUSTE
+    </button>
+</div>
+
     </div>
 
     <script>
