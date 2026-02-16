@@ -21,17 +21,25 @@
         </header>
 
         <!-- TOOLBAR -->
-        <div class="toolbar-grid">
-            <div>
-                <label class="label-herramienta">ALMACÉN</label>
-                <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
-                    <% almacenesPermitidos.forEach(wh => { %>
-                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
-                    <% }) %>
-                </select>
-            </div>
-            <div>
-                <label class="label-herramienta">BUSCAR PRODUCTO</label>
+<div class="toolbar-grid" style="grid-template-columns: 1.2fr 1fr auto; gap: 15px;">
+    <div>
+        <label class="label-herramienta">ALMACÉN</label>
+        <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+            <% almacenesPermitidos.forEach(wh => { %>
+                <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+            <% }) %>
+        </select>
+    </div>
+    <div>
+        <label class="label-herramienta">BUSCAR PRODUCTO</label>
+        <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+    </div>
+    <div style="display: flex; align-items: flex-end;">
+        <button onclick="registrarSalidas()" class="btn-guardar-top" style="width: auto; padding: 0 20px;">
+            <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
+        </button>
+    </div>
+</div>ass="label-herramienta">BUSCAR PRODUCTO</label>
                 <input type="text" id="buscador" class="search-input" placeholder="Escribir nombre..." onkeyup="filtrarTabla()">
             </div>
             <button onclick="registrarSalidas()" class="btn-guardar-top">

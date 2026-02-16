@@ -34,13 +34,18 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         const wh = req.query.wh;
 
         // Cargar almacenes
-        const whQuery = isCorp 
-            ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC' 
-            : `SELECT a.clave_sap, a.nombre 
-               FROM almacenes a 
-               JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
-               WHERE LOWER(ua.email) = $1 
-               ORDER BY a.nombre ASC`;
+  const query = `
+    SELECT 
+        i.descripcion AS producto, 
+        i.codigo_articulo AS codigo_general, 
+        i.tipo AS unidad,
+        COALESCE(v.stock_actual, 0) AS stock_actual -- VITAL: Asegura que no sea null
+    FROM items i
+    JOIN items_almacen ia ON i.codigo_articulo = ia.codigo_articulo
+    LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
+        AND v.codigo_almacen = $1
+    WHERE ia.codigo_almacen = $1
+    ORDER BY i.descripcion ASC`;
         
         const whs = await pool.query(whQuery, isCorp ? [] : [userEmail]);
         const activeWh = wh || (whs.rows.length > 0 ? whs.rows[0].clave_sap : null);
