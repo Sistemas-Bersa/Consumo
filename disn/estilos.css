@@ -9,6 +9,22 @@
     --negro: #1a1a1a;
 }
 
+.brand-icon {
+    width: 45px;
+    height: 45px;
+    background-color: var(--naranja-bersa) !important; /* Fondo naranja obligatorio */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.brand-icon i {
+    color: var(--azul-bersa) !important;
+}
+
+
 /* BASE */
 body {
     background-color: var(--azul-bersa);
@@ -58,23 +74,23 @@ body {
 }
 
 /* TOOLBAR - FLEXBOX PARA EVITAR TRASLAPES */
-.toolbar-flex {
-    display: flex;
+.toolbar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto; 
     gap: 20px;
     background: rgba(255, 255, 255, 0.03);
     padding: 25px;
     border-radius: 12px;
     border: 1px solid rgba(255, 158, 27, 0.2);
     margin-bottom: 30px;
-    align-items: flex-end;
+    align-items: flex-end; /* Alinea todo por la base */
 }
 
 .toolbar-item {
-    flex: 1; /* Esto hace que el buscador y el selector crezcan */
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
-
 .label-herramienta {
     color: var(--naranja-bersa);
     font-size: 11px;
