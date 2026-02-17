@@ -129,6 +129,22 @@ body {
     border-color: white transparent transparent transparent !important;
 }
 
+.ts-control .input-placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-style: italic;
+}
+
+/* Cuando escribes, que el texto sea blanco */
+.ts-control input {
+    color: white !important;
+}
+
+/* Quitar borde azul al escribir */
+.ts-control.focus {
+    border-color: var(--naranja-bersa) !important;
+    box-shadow: 0 0 10px rgba(255, 158, 27, 0.2) !important;
+}
+
 
 .label-herramienta {
     color: var(--naranja-bersa);

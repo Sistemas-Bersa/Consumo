@@ -38,7 +38,7 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
                WHERE LOWER(ua.email) = $1 ORDER BY a.nombre ASC`;
         
         const whsResult = await pool.query(whQuery, office === 'corporativo' ? [] : [userEmail]);
-        const activeWh = selectedWh || (whsResult.rows.length > 0 ? whsResult.rows[0].clave_sap : null);
+        const activeWh = wh || null;
 
    let datos = [];
         if (activeWh) {

@@ -33,13 +33,16 @@
             <div class="input-wrapper">
                 <label class="label-herramienta">ALMACÉN / UNIDAD</label>
                 <!-- Quitamos la clase search-input para que TomSelect tome el control -->
-                <select id="selectorAlmacen" placeholder="Buscar almacén...">
-                    <% almacenesPermitidos.forEach(wh => { %>
-                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>>
-                            <%= wh.nombre %>
-                        </option>
-                    <% }) %>
-                </select>
+              <select id="selectorAlmacen" class="search-input" placeholder="Escribe para buscar almacén...">
+    <!-- Opción vacía para el placeholder -->
+    <option value="">Seleccione un almacén...</option>
+
+    <% almacenesPermitidos.forEach(wh => { %>
+        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>>
+            <%= wh.nombre %>
+        </option>
+    <% }) %>
+</select>
             </div>
 
             <!-- 2. BUSCADOR DE PRODUCTOS -->
@@ -110,14 +113,18 @@
         lucide.createIcons();
 
         // INICIALIZAR EL BUSCADOR DE ALMACENES
-        new TomSelect("#selectorAlmacen",{
-            create: false,
-            sortField: { field: "text", direction: "asc" },
-            onChange: function(value) {
-                // Redirigir al seleccionar
-                location.href = '/consumo?wh=' + value;
-            }
-        });
+new TomSelect("#selectorAlmacen", {
+    create: false,
+    sortField: { field: "text", direction: "asc" },
+    placeholder: "🔍 Buscar almacén...", // Texto que sale cuando está vacío
+    allowEmptyOption: true,
+    onChange: function(value) {
+        if (value) {
+            // Solo redirige si seleccionó un valor real
+            location.href = '/consumo?wh=' + value;
+        }
+    }
+});
 
         // TUS FUNCIONES EXISTENTES
         function validarTecla(e,i){const p=i.getAttribute('data-es-pieza')==='true';if(!p)return true;const c=e.which?e.which:e.keyCode;if(c>31&&(c<48||c>57))return false;return true;}
