@@ -7,37 +7,21 @@
     --blanco: #ffffff;
     --gris-claro: rgba(255, 255, 255, 0.05);
     --negro: #1a1a1a;
+    --borde-suave: #eeeeee;
 }
-
-.brand-icon {
-    width: 40px;
-    height: 40px;
-    background-color: var(--naranja-bersa) !important;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.brand-icon i {
-    color: var(--azul-bersa) !important;
-    stroke-width: 3px; 
-}
-
 
 /* BASE */
 body {
     background-color: var(--azul-bersa);
     color: var(--blanco);
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Roboto, sans-serif;
     margin: 0; padding: 0;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 30px 20px;
 }
 
 /* HEADER */
@@ -46,57 +30,71 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 3px solid var(--rojo-bersa);
-    padding-bottom: 15px;
-    margin-bottom: 25px;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-/* BOTONES BLANCOS (INICIO Y REGISTRO) */
-.btn-registrar-blanco {
-    background-color: var(--blanco) !important;
-    color: var(--azul-bersa) !important;
+.brand { display: flex; align-items: center; gap: 15px; }
+
+/* Icono del Módulo (Círculo Naranja) */
+.brand-icon {
+    width: 45px;
     height: 45px;
-    padding: 0 20px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.8em;
+    background-color: var(--naranja-bersa) !important;
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: none;
-    cursor: pointer;
+    justify-content: center;
+    flex-shrink: 0; /* Evita que se aplaste */
+}
+.brand-icon i { color: var(--azul-bersa) !important; stroke-width: 2.5px; }
+
+/* BOTÓN INICIO (BLANCO SOLIDO) */
+.btn-inicio {
+    background-color: #ffffff !important;
+    color: var(--azul-bersa) !important;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+    border: 2px solid transparent;
     white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: 0.3s ease;
 }
 
-.btn-registrar-blanco:hover {
+.btn-inicio:hover {
     background-color: #f0f0f0 !important;
     transform: translateY(-2px);
 }
 
-/* Ajuste para el input de fecha */
-input[type="date"].search-input {
-    font-family: inherit;
-    cursor: pointer;
+/* --- BLOQUE 1: FILTROS (Almacén y Buscador) --- */
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-/* TOOLBAR - FLEXBOX PARA EVITAR TRASLAPES */
-.toolbar-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 180px auto; 
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.03);
+/* --- BLOQUE 2: ACCIONES (Fecha y Botón) --- */
+.action-row {
+    display: flex;
+    justify-content: flex-end; /* Alineado a la derecha */
+    gap: 20px;
+    align-items: flex-end;
+    background: rgba(255, 255, 255, 0.03); /* Fondo sutil para agrupar */
     padding: 20px;
     border-radius: 12px;
     border: 1px solid rgba(255, 158, 27, 0.2);
-    margin-bottom: 25px;
-    align-items: flex-end;
+    margin-bottom: 30px;
 }
 
-.toolbar-item {
+.input-wrapper {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    min-width: 0;
 }
 
 .label-herramienta {
@@ -105,50 +103,63 @@ input[type="date"].search-input {
     font-weight: 800;
     text-transform: uppercase;
     margin-bottom: 8px;
+    display: block;
 }
 
 .search-input {
     width: 100%;
-    height: 45px;
+    height: 48px; /* Un poco más alto para mejor clic */
     padding: 0 15px;
     background-color: rgba(255, 255, 255, 0.05);
     color: white;
     border: 1px solid rgba(255, 158, 27, 0.3);
     border-radius: 8px;
     outline: none;
+    box-sizing: border-box; /* Vital para que no se salga del ancho */
 }
 
-/* TABLA BLANCA */
-.stock-table { 
-    width: 100%; 
-    border-collapse: separate; 
-    border-spacing: 0 10px; 
-}
-.stock-table th { 
-    background: var(--naranja-bersa); 
-    color: white; 
-    padding: 15px; 
-    font-size: 0.8em; 
-    text-transform: uppercase;
+/* Ajustes específicos para Select y Date */
+select.search-input { appearance: auto; cursor: pointer; }
+select.search-input option { background-color: var(--azul-bersa); color: white; }
+input[type="date"].search-input { cursor: pointer; font-family: inherit; }
+
+/* BOTÓN REGISTRAR BLANCO */
+.btn-registrar-blanco {
+    height: 48px;
+    padding: 0 30px;
+    background-color: #ffffff;
+    color: var(--azul-bersa);
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
+.btn-registrar-blanco:hover {
+    background-color: #f8f8f8;
+    transform: translateY(-2px);
+}
+
+/* TABLA */
+.table-wrapper { overflow-x: auto; border-radius: 8px; }
+.stock-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+.stock-table th { background: var(--naranja-bersa); color: white; padding: 15px; font-size: 0.85em; text-transform: uppercase; }
+.stock-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
+.stock-table th:last-child { border-radius: 0 8px 8px 0; }
 .stock-row { background-color: var(--blanco); }
-.stock-row td { 
-    padding: 15px; 
-    color: var(--negro); 
-    border-top: 1px solid #eee; 
-    border-bottom: 1px solid #eee; 
-}
+.stock-row td { padding: 15px; color: var(--negro); border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.stock-row td:first-child { border-left: 1px solid #eee; border-radius: 8px 0 0 8px; }
+.stock-row td:last-child { border-right: 1px solid #eee; border-radius: 0 8px 8px 0; }
 
-/* COLUMNAS SANS-SERIF GRUESAS */
-.text-bold-negro { 
-    font-weight: 800; 
-    color: var(--azul-bersa); 
-}
-.text-bold-naranja { 
-    font-weight: 700; 
-    color: var(--naranja-bersa); 
-    text-transform: uppercase;
-}
-
+/* TEXTOS Y ALERTA */
+.text-bold-negro { font-weight: 800; color: var(--azul-bersa); }
+.text-bold-naranja { font-weight: 700; color: var(--naranja-bersa); text-transform: uppercase; }
 .text-alerta { color: var(--rojo-bersa) !important; font-weight: 900; }
+.input-fisico { width: 100px; height: 38px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-weight: bold; }
+.no-data { text-align: center; padding: 50px; color: white; font-style: italic; opacity: 0.6; }
