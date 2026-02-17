@@ -58,7 +58,66 @@ body {
     align-items: flex-end;
 }
 
-.input-wrapper { display: flex; flex-direction: column; width: 100%; }
+.input-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- ESTANDARIZACIÓN DE ALTURAS (CLAVE PARA ALINEAR) --- */
+.search-input, 
+.ts-control, 
+.btn-registrar-blanco {
+    height: 48px !important; /* Todos miden EXACTAMENTE lo mismo */
+    min-height: 48px;
+    box-sizing: border-box; /* Incluye bordes en el cálculo */
+}
+
+/* INPUTS (DISEÑO) */
+.search-input {
+    width: 100%;
+    padding: 0 15px;
+    background-color: #1e3a5f;
+    color: white;
+    border: 1px solid rgba(255, 158, 27, 0.5);
+    border-radius: 8px;
+    outline: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9em;
+}
+
+/* AJUSTES ESPECÍFICOS PARA TOM SELECT (EL BUSCADOR DE ALMACÉN) */
+.ts-wrapper { width: 100%; }
+.ts-control {
+    background-color: #1e3a5f !important;
+    color: white !important;
+    border: 1px solid rgba(255, 158, 27, 0.5) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 15px !important;
+}
+.ts-control input { color: white !important; font-family: 'Montserrat', sans-serif !important; }
+.ts-dropdown { background-color: var(--azul-bersa) !important; border: 1px solid var(--naranja-bersa); }
+.ts-dropdown .option { color: white; padding: 10px; }
+.ts-dropdown .active { background-color: var(--naranja-bersa); color: var(--azul-bersa); font-weight: bold; }
+
+/* BOTÓN REGISTRAR */
+.btn-registrar-blanco {
+    background-color: #ffffff;
+    color: var(--azul-bersa);
+    padding: 0 25px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    white-space: nowrap; /* Evita que el texto se parta en dos */
+    margin-bottom: 0 !important; /* Asegura que no tenga margen extra abajo */
+}
 
 .label-herramienta {
     color: var(--naranja-bersa);
@@ -74,28 +133,6 @@ body {
     border-radius: 8px; outline: none;
 }
 
-/* --- ESTILOS PARA TOM SELECT (BUSCADOR DE ALMACÉN) --- */
-.ts-control {
-    background-color: #1e3a5f !important; /* Azul más claro */
-    color: white !important;
-    border: 1px solid rgba(255, 158, 27, 0.3) !important;
-    border-radius: 8px !important;
-    height: 45px !important;
-    display: flex !important; align-items: center !important;
-}
-.ts-control input { color: white !important; }
-.ts-dropdown { background-color: var(--azul-bersa) !important; border: 1px solid var(--naranja-bersa) !important; color: white !important; }
-.ts-dropdown .active { background-color: var(--naranja-bersa) !important; color: var(--azul-bersa) !important; font-weight: bold; }
-
-/* BOTÓN REGISTRAR */
-.btn-registrar-blanco {
-    height: 45px; padding: 0 25px;
-    background-color: #ffffff; color: var(--azul-bersa);
-    border: none; border-radius: 8px; font-weight: 800;
-    cursor: pointer; display: flex; align-items: center; gap: 10px;
-    transition: 0.3s; white-space: nowrap;
-}
-.btn-registrar-blanco:hover { background-color: #f0f0f0; transform: translateY(-2px); }
 
 /* TABLA */
 .table-wrapper { overflow-x: auto; }

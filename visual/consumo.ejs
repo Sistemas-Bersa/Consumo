@@ -46,15 +46,16 @@
             </div>
 
             <!-- 3. FECHA -->
-            <div class="input-wrapper">
-                <label class="label-herramienta">FECHA SALIDA</label>
-                <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
-            </div>
-            
-            <!-- 4. BOTÓN -->
-            <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-                <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
-            </button>
+           <div class="input-wrapper">
+    <label class="label-herramienta">FECHA DE SALIDA</label>
+    <!-- Sin estilos inline, el CSS lo controla -->
+    <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
+</div>
+
+<!-- 4. BOTÓN -->
+<button onclick="registrarSalidas()" class="btn-registrar-blanco">
+    <i data-lucide="send" size="20"></i> REGISTRAR SALIDAS
+</button>
         </div>
 
         <!-- TABLA -->
