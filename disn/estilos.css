@@ -10,6 +10,16 @@
     --borde-suave: #eeeeee;
 }
 
+/* ICONO DEL HEADER */
+.brand-icon {
+    width: 40px; height: 40px;
+    background-color: var(--naranja-bersa) !important;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.brand-icon i { color: var(--azul-bersa) !important; stroke-width: 3px; }
+
 /* BASE */
 body {
     background-color: var(--azul-bersa);
@@ -21,58 +31,36 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 30px 20px;
+    padding: 40px 20px;
 }
 
 /* HEADER */
 .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
     border-bottom: 3px solid var(--rojo-bersa);
-    padding-bottom: 20px;
-    margin-bottom: 30px;
+    padding-bottom: 15px; margin-bottom: 25px;
 }
-
 .brand { display: flex; align-items: center; gap: 15px; }
 
-/* Icono del Módulo (Círculo Naranja) */
-.brand-icon {
-    width: 45px;
-    height: 45px;
-    background-color: var(--naranja-bersa) !important;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0; /* Evita que se aplaste */
-}
-.brand-icon i { color: var(--azul-bersa) !important; stroke-width: 2.5px; }
-
-/* BOTÓN INICIO (BLANCO SOLIDO) */
+/* BOTÓN INICIO */
 .btn-inicio {
-    background-color: #ffffff !important;
-    color: var(--azul-bersa) !important;
+    background-color: var(--blanco);
+    color: var(--azul-bersa);
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 8px;
     font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 8px;
     transition: 0.3s;
-    border: 2px solid transparent;
-    white-space: nowrap;
+    border: 1px solid #ddd;
 }
+.btn-inicio:hover { background-color: #f0f0f0; transform: translateY(-2px); }
 
-.btn-inicio:hover {
-    background-color: #f0f0f0 !important;
-    transform: translateY(-2px);
-}
-
+/* --- TOOLBAR UNIFICADA (AQUÍ ESTABA EL ERROR) --- */
 .toolbar-unified {
     display: flex;
-    flex-wrap: wrap; /* Permite que baje si no cabe, pero mantiene todo junto */
+    flex-wrap: wrap; /* Permite bajar si la pantalla es muy chica */
+    justify-content: space-between;
     align-items: flex-end;
     gap: 20px;
     background: rgba(255, 255, 255, 0.03);
@@ -82,14 +70,15 @@ body {
     margin-bottom: 25px;
 }
 
+/* Grupo Izquierdo: Almacén y Buscador (Se expanden) */
 .toolbar-group-left {
     display: flex;
     gap: 20px;
-    flex: 1; /* Ocupa todo el espacio izquierdo */
+    flex: 1; /* Ocupa el espacio disponible */
     min-width: 300px;
 }
 
-/* Los botones y fecha se ajustan a la derecha */
+/* Grupo Derecho: Fecha y Botón (Se quedan compactos) */
 .toolbar-group-right {
     display: flex;
     gap: 20px;
@@ -112,59 +101,95 @@ body {
 }
 
 .search-input {
-    width: 100%;
-    height: 48px; /* Un poco más alto para mejor clic */
-    padding: 0 15px;
+    width: 100%; height: 45px; padding: 0 15px;
     background-color: rgba(255, 255, 255, 0.05);
     color: white;
     border: 1px solid rgba(255, 158, 27, 0.3);
     border-radius: 8px;
     outline: none;
-    box-sizing: border-box; /* Vital para que no se salga del ancho */
+    box-sizing: border-box; /* Vital para no desbordar */
+}
+.search-input:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--naranja-bersa);
+    box-shadow: 0 0 10px rgba(255, 158, 27, 0.2);
 }
 
-/* Ajustes específicos para Select y Date */
-select.search-input { appearance: auto; cursor: pointer; }
-select.search-input option { background-color: var(--azul-bersa); color: white; }
+select.search-input { cursor: pointer; appearance: auto; }
+select.search-input option { background-color: var(--azul-bersa); color: white; padding: 10px; }
 input[type="date"].search-input { cursor: pointer; font-family: inherit; }
 
-/* BOTÓN REGISTRAR BLANCO */
+/* BOTÓN REGISTRAR */
 .btn-registrar-blanco {
-    height: 48px;
-    padding: 0 30px;
+    height: 45px; padding: 0 25px;
     background-color: #ffffff;
     color: var(--azul-bersa);
-    border: none;
+    border: 1px solid #ddd;
     border-radius: 8px;
     font-weight: 800;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 10px;
     transition: 0.3s;
     white-space: nowrap;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-
 .btn-registrar-blanco:hover {
-    background-color: #f8f8f8;
+    background-color: #f0f0f0;
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* TABLA */
+/* TABLA Y TIPOGRAFÍA BOLD */
 .table-wrapper { overflow-x: auto; border-radius: 8px; }
-.stock-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-.stock-table th { background: var(--naranja-bersa); color: white; padding: 15px; font-size: 0.85em; text-transform: uppercase; }
+.stock-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+
+.stock-table th { 
+    background: var(--naranja-bersa); 
+    color: var(--blanco); 
+    padding: 15px; 
+    font-size: 0.8em; 
+    text-transform: uppercase;
+    font-weight: 800;
+}
 .stock-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
 .stock-table th:last-child { border-radius: 0 8px 8px 0; }
-.stock-row { background-color: var(--blanco); }
-.stock-row td { padding: 15px; color: var(--negro); border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+
+.stock-row { background-color: var(--blanco); transition: 0.2s; }
+.stock-row:hover { background-color: #f9f9f9; transform: scale(1.002); }
+
+.stock-row td { 
+    padding: 15px; 
+    color: var(--negro); 
+    border-top: 1px solid #eee; 
+    border-bottom: 1px solid #eee; 
+}
+
+/* -- AQUÍ ESTÁ EL CAMBIO PARA LA LETRA BOLD (GRUESA) -- */
+.text-bold-negro { 
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 900 !important; /* Extra grueso */
+    color: var(--azul-bersa) !important; 
+    font-size: 1.05em;
+}
+
+.text-bold-naranja { 
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 800 !important; 
+    color: var(--naranja-bersa) !important; 
+    text-transform: uppercase;
+}
+
 .stock-row td:first-child { border-left: 1px solid #eee; border-radius: 8px 0 0 8px; }
 .stock-row td:last-child { border-right: 1px solid #eee; border-radius: 0 8px 8px 0; }
 
-/* TEXTOS Y ALERTA */
-.text-bold-negro { font-weight: 800; color: var(--azul-bersa); }
-.text-bold-naranja { font-weight: 700; color: var(--naranja-bersa); text-transform: uppercase; }
+.text-stock { font-weight: bold; font-size: 1.1em; }
+.text-saldo { font-weight: 900; color: var(--azul-bersa); font-size: 1.2em; }
 .text-alerta { color: var(--rojo-bersa) !important; font-weight: 900; }
-.input-fisico { width: 100px; height: 38px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-weight: bold; }
+
+.input-fisico {
+    width: 100px; height: 38px;
+    border: 2px solid #ddd; border-radius: 6px;
+    text-align: center; font-weight: bold; font-size: 1em;
+    outline: none;
+}
+.input-fisico:focus { border-color: var(--naranja-bersa); }
 .no-data { text-align: center; padding: 50px; color: white; font-style: italic; opacity: 0.6; }

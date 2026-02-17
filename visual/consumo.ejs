@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salida de Inventario | Bersa</title>
+    <title>Consumo | Bersa Cloud</title>
     <link rel="stylesheet" href="/estilos.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -17,16 +17,15 @@
                 </div>
                 <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
             </div>
-            <!-- Botón Inicio -->
             <a href="https://bersacloud.app" class="btn-inicio">
-                <i data-lucide="home" size="20"></i> INICIO
+                <i data-lucide="home" size="18"></i> INICIO
             </a>
         </header>
 
-  <!-- TOOLBAR UNIFICADA -->
+        <!-- TOOLBAR UNIFICADA (Aquí corregimos la alineación) -->
         <div class="toolbar-unified">
             
-            <!-- IZQUIERDA: Selectores -->
+            <!-- GRUPO IZQUIERDO: Almacén y Buscador -->
             <div class="toolbar-group-left">
                 <div class="input-wrapper">
                     <label class="label-herramienta">ALMACÉN</label>
@@ -38,11 +37,11 @@
                 </div>
                 <div class="input-wrapper">
                     <label class="label-herramienta">BUSCAR PRODUCTO</label>
-                    <input type="text" id="buscador" class="search-input" placeholder="Filtrar lista..." onkeyup="filtrarTabla()">
+                    <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
                 </div>
             </div>
 
-            <!-- DERECHA: Fecha y Acción -->
+            <!-- GRUPO DERECHO: Fecha y Botón -->
             <div class="toolbar-group-right">
                 <div class="input-wrapper" style="width: 160px;">
                     <label class="label-herramienta">FECHA SALIDA</label>
@@ -72,8 +71,11 @@
                         <% datos.forEach((p, index) => { %>
                             <% const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA'); %>
                             <tr class="stock-row">
+                                <!-- Texto en Negrita y Azul Bersa -->
                                 <td class="text-bold-negro"><%= p.producto %></td>
+                                <!-- Texto en Negrita y Naranja -->
                                 <td class="text-bold-naranja" style="text-align: center;"><%= p.unidad %></td>
+                                
                                 <td style="text-align: center; font-weight: bold;">
                                     <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
@@ -116,7 +118,6 @@
             const idx = input.getAttribute('data-index');
             const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
             const retiro = parseFloat(input.value) || 0;
-            
             const total = actual - retiro;
             const display = document.getElementById(`saldo-${idx}`);
             display.innerText = total.toFixed(3);
@@ -128,7 +129,7 @@
             const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => i.value > 0);
             
             if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
-            if(!fecha) return alert("Seleccione una fecha.");
+            if(!fecha) return alert("Seleccione la fecha del consumo.");
 
             const conteos = inputs.map(i => ({
                 codigo: i.getAttribute('data-codigo'),
@@ -143,8 +144,8 @@
                 body: JSON.stringify({ almacen: '<%= almacenActivo %>', fecha, conteos })
             });
 
-            if (res.ok) { alert("✅ Éxito."); location.reload(); }
-            else { alert("❌ Error."); }
+            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
+            else { alert("❌ Error al guardar."); }
         }
 
         function filtrarTabla() {
