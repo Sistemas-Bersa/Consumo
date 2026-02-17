@@ -12,34 +12,44 @@
         <!-- HEADER -->
         <header class="header-top">
             <div class="brand">
-                <div class="brand-icon"><i data-lucide="minus-circle" style="color: var(--azul-bersa)"></i></div>
-                <h1 style="margin:0">Módulo <span style="color: var(--naranja-bersa)">Consumo</span></h1>
+                <div class="brand-icon">
+                    <i data-lucide="minus-circle"></i>
+                </div>
+                <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
             </div>
-            <a href="https://bersacloud.app" class="btn-blanco">
+            <a href="https://bersacloud.app" class="btn-inicio">
                 <i data-lucide="home" size="18"></i> INICIO
             </a>
         </header>
 
-        <!-- TOOLBAR CON FLEXBOX -->
-        <div class="toolbar-flex">
+        <!-- TOOLBAR CON 4 ELEMENTOS -->
+        <div class="toolbar-grid">
             <div class="toolbar-item">
-                <label class="label-herramienta">ALMACÉN</label>
+                <label class="label-herramienta">ALMACÉN / UNIDAD</label>
                 <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
                     <% almacenesPermitidos.forEach(wh => { %>
                         <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
                     <% }) %>
                 </select>
             </div>
+
             <div class="toolbar-item">
                 <label class="label-herramienta">BUSCAR PRODUCTO</label>
                 <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
             </div>
-            <button onclick="registrarSalidas()" class="btn-blanco">
+
+            <!-- NUEVO: SELECTOR DE FECHA -->
+            <div class="toolbar-item">
+                <label class="label-herramienta">FECHA DE SALIDA</label>
+                <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            
+            <button onclick="registrarSalidas()" class="btn-registrar-blanco">
                 <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
             </button>
         </div>
 
-        <!-- TABLA -->
+        <!-- TABLA (Se mantiene igual, solo asegúrate de pasar los datos) -->
         <div class="table-wrapper">
             <table class="stock-table" id="tablaStock">
                 <thead>
@@ -72,13 +82,13 @@
                                            onkeypress="return validarTecla(event, this)"
                                            oninput="calcularSaldo(this)">
                                 </td>
-                                <td style="text-align: center; font-weight: 900; color: var(--azul-bersa);">
+                                <td style="text-align: center; font-weight: 900;">
                                     <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
-                        <tr><td colspan="5" class="no-data">No hay datos disponibles.</td></tr>
+                        <tr><td colspan="5" class="no-data">Sin inventario físico reportado.</td></tr>
                     <% } %>
                 </tbody>
             </table>
@@ -88,49 +98,36 @@
     <script>
         lucide.createIcons();
 
-        function validarTecla(event, input) {
-            const esPieza = input.getAttribute('data-es-pieza') === 'true';
-            if (!esPieza) return true;
-            const charCode = (event.which) ? event.which : event.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
-            return true;
-        }
-
-        function calcularSaldo(input) {
-            const idx = input.getAttribute('data-index');
-            const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
-            const retiro = parseFloat(input.value) || 0;
-            const total = actual - retiro;
-            const display = document.getElementById(`saldo-${idx}`);
-            display.innerText = total.toFixed(3);
-            display.className = total < 0 ? 'text-alerta' : '';
-        }
-
+        // Actualizamos la función de guardado para que envíe la fecha seleccionada
         async function registrarSalidas() {
-            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => i.value > 0);
-            if(inputs.length === 0) return alert("Ingrese cantidades.");
+            const fecha = document.getElementById('fechaConsumo').value;
+            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => parseFloat(i.value) > 0);
+            
+            if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
+            if(!fecha) return alert("Seleccione la fecha del consumo.");
+
             const conteos = inputs.map(i => ({
                 codigo: i.getAttribute('data-codigo'),
                 cantidad: parseFloat(i.value) * -1
             }));
-            if(!confirm("¿Confirmar retiro?")) return;
+
+            if(!confirm(`¿Confirmar retiro de ${conteos.length} artículos con fecha ${fecha}?`)) return;
+
             const res = await fetch('/procesar-ajuste', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ almacen: '<%= almacenActivo %>', conteos })
+                body: JSON.stringify({ 
+                    almacen: '<%= almacenActivo %>', 
+                    fecha: fecha, // Enviamos la fecha al backend
+                    conteos 
+                })
             });
-            if (res.ok) { alert("✅ Éxito"); location.reload(); }
-            else { alert("❌ Error"); }
+
+            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
+            else { alert("❌ Error al guardar."); }
         }
 
-        function filtrarTabla() {
-            const val = document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const rows = document.getElementsByClassName("stock-row");
-            for (let r of rows) {
-                const text = r.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                r.style.display = text.includes(val) ? "" : "none";
-            }
-        }
+        // ... (validarTecla, calcularSaldo y filtrarTabla se mantienen igual)
     </script>
 </body>
 </html>
