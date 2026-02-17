@@ -40,21 +40,21 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         const whsResult = await pool.query(whQuery, office === 'corporativo' ? [] : [userEmail]);
         const activeWh = selectedWh || (whsResult.rows.length > 0 ? whsResult.rows[0].clave_sap : null);
 
-        // 2. CONSULTA ABIERTA (Muestra todo el catálogo y trae el stock si existe)
-        let datos = [];
+   let datos = [];
         if (activeWh) {
-            const itemsQuery = `
+            const dataQuery = `
                 SELECT 
                     i.descripcion AS producto, 
                     i.codigo_articulo AS codigo_general, 
                     i.tipo AS unidad,
-                    COALESCE(v.stock_actual, 0) AS stock_actual
-                FROM items i
-                LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
-                    AND v.codigo_almacen = $1
+                    v.stock_actual -- Ya no necesitamos COALESCE porque filtraremos los nulos
+                FROM vista_inventario_fisico_real v
+                JOIN items i ON v.codigo_general = i.codigo_articulo
+                WHERE v.codigo_almacen = $1 
+                AND v.stock_actual > 0 -- EL FILTRO CLAVE
                 ORDER BY i.descripcion ASC`;
             
-            const resData = await pool.query(itemsQuery, [activeWh]);
+            const resData = await pool.query(dataQuery, [activeWh]);
             datos = resData.rows;
         }
 

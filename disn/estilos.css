@@ -70,29 +70,34 @@ body {
     transform: translateY(-2px);
 }
 
-/* --- BLOQUE 1: FILTROS (Almacén y Buscador) --- */
-.filter-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-/* --- BLOQUE 2: ACCIONES (Fecha y Botón) --- */
-.action-row {
+.toolbar-unified {
     display: flex;
-    justify-content: flex-end; /* Alineado a la derecha */
-    gap: 20px;
+    flex-wrap: wrap; /* Permite que baje si no cabe, pero mantiene todo junto */
     align-items: flex-end;
-    background: rgba(255, 255, 255, 0.03); /* Fondo sutil para agrupar */
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.03);
     padding: 20px;
     border-radius: 12px;
     border: 1px solid rgba(255, 158, 27, 0.2);
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+}
+
+.toolbar-group-left {
+    display: flex;
+    gap: 20px;
+    flex: 1; /* Ocupa todo el espacio izquierdo */
+    min-width: 300px;
+}
+
+/* Los botones y fecha se ajustan a la derecha */
+.toolbar-group-right {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
 }
 
 .input-wrapper {
-    width: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
 }

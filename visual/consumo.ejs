@@ -23,32 +23,36 @@
             </a>
         </header>
 
-        <!-- BLOQUE 1: BÚSQUEDA Y SELECCIÓN (FILA SUPERIOR) -->
-        <div class="filter-row">
-            <div class="input-wrapper">
-                <label class="label-herramienta">ALMACÉN / UNIDAD</label>
-                <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
-                    <% almacenesPermitidos.forEach(wh => { %>
-                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
-                    <% }) %>
-                </select>
-            </div>
-            <div class="input-wrapper">
-                <label class="label-herramienta">BUSCAR PRODUCTO</label>
-                <input type="text" id="buscador" class="search-input" placeholder="Escribir para filtrar..." onkeyup="filtrarTabla()">
-            </div>
-        </div>
-
-        <!-- BLOQUE 2: ACCIONES DE SALIDA (FILA INFERIOR) -->
-        <div class="action-row">
-            <div class="input-wrapper" style="max-width: 200px;">
-                <label class="label-herramienta">FECHA DE SALIDA</label>
-                <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
-            </div>
+  <!-- TOOLBAR UNIFICADA -->
+        <div class="toolbar-unified">
             
-            <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-                <i data-lucide="send" size="20"></i> REGISTRAR SALIDAS
-            </button>
+            <!-- IZQUIERDA: Selectores -->
+            <div class="toolbar-group-left">
+                <div class="input-wrapper">
+                    <label class="label-herramienta">ALMACÉN</label>
+                    <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
+                        <% almacenesPermitidos.forEach(wh => { %>
+                            <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <label class="label-herramienta">BUSCAR PRODUCTO</label>
+                    <input type="text" id="buscador" class="search-input" placeholder="Filtrar lista..." onkeyup="filtrarTabla()">
+                </div>
+            </div>
+
+            <!-- DERECHA: Fecha y Acción -->
+            <div class="toolbar-group-right">
+                <div class="input-wrapper" style="width: 160px;">
+                    <label class="label-herramienta">FECHA SALIDA</label>
+                    <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
+                </div>
+                
+                <button onclick="registrarSalidas()" class="btn-registrar-blanco">
+                    <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
+                </button>
+            </div>
         </div>
 
         <!-- TABLA -->
