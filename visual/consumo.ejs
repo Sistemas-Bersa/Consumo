@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consumo | Bersa Cloud</title>
+    <!-- Importante: Verifica que cargue el CSS nuevo -->
     <link rel="stylesheet" href="/estilos.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -15,20 +16,20 @@
                 <div class="brand-icon">
                     <i data-lucide="minus-circle"></i>
                 </div>
-                <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
+                <h1 style="margin:0; font-weight: 900;">Módulo <span class="text-naranja">Consumo</span></h1>
             </div>
             <a href="https://bersacloud.app" class="btn-inicio">
-                <i data-lucide="home" size="18"></i> INICIO
+                <i data-lucide="home" size="20"></i> INICIO
             </a>
         </header>
 
-        <!-- TOOLBAR UNIFICADA (Aquí corregimos la alineación) -->
+        <!-- TOOLBAR (Barra de herramientas) -->
         <div class="toolbar-unified">
             
-            <!-- GRUPO IZQUIERDO: Almacén y Buscador -->
+            <!-- Grupo Izquierdo -->
             <div class="toolbar-group-left">
                 <div class="input-wrapper">
-                    <label class="label-herramienta">ALMACÉN</label>
+                    <label class="label-herramienta">ALMACÉN / UNIDAD</label>
                     <select class="search-input" onchange="location.href='/consumo?wh='+this.value">
                         <% almacenesPermitidos.forEach(wh => { %>
                             <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>><%= wh.nombre %></option>
@@ -37,19 +38,19 @@
                 </div>
                 <div class="input-wrapper">
                     <label class="label-herramienta">BUSCAR PRODUCTO</label>
-                    <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
+                    <input type="text" id="buscador" class="search-input" placeholder="Escribir para filtrar..." onkeyup="filtrarTabla()">
                 </div>
             </div>
 
-            <!-- GRUPO DERECHO: Fecha y Botón -->
+            <!-- Grupo Derecho -->
             <div class="toolbar-group-right">
-                <div class="input-wrapper" style="width: 160px;">
-                    <label class="label-herramienta">FECHA SALIDA</label>
+                <div class="input-wrapper" style="width: 170px;">
+                    <label class="label-herramienta">FECHA DE SALIDA</label>
                     <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
                 </div>
                 
                 <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-                    <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
+                    <i data-lucide="send" size="20"></i> REGISTRAR SALIDAS
                 </button>
             </div>
         </div>
@@ -71,12 +72,9 @@
                         <% datos.forEach((p, index) => { %>
                             <% const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA'); %>
                             <tr class="stock-row">
-                                <!-- Texto en Negrita y Azul Bersa -->
                                 <td class="text-bold-negro"><%= p.producto %></td>
-                                <!-- Texto en Negrita y Naranja -->
                                 <td class="text-bold-naranja" style="text-align: center;"><%= p.unidad %></td>
-                                
-                                <td style="text-align: center; font-weight: bold;">
+                                <td style="text-align: center; font-weight: bold; font-size: 1.1em;">
                                     <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
                                 <td style="text-align: center;">
@@ -90,13 +88,16 @@
                                            onkeypress="return validarTecla(event, this)"
                                            oninput="calcularSaldo(this)">
                                 </td>
-                                <td style="text-align: center; font-weight: 900; color: var(--azul-bersa);">
+                                <td style="text-align: center; font-weight: 900; color: var(--azul-bersa); font-size: 1.2em;">
                                     <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
-                        <tr><td colspan="5" class="no-data">No hay datos disponibles.</td></tr>
+                        <tr><td colspan="5" class="no-data">
+                            <i data-lucide="inbox" size="48" style="margin-bottom: 10px; opacity: 0.5;"></i><br>
+                            No hay productos disponibles en este almacén.
+                        </td></tr>
                     <% } %>
                 </tbody>
             </table>
@@ -105,57 +106,11 @@
 
     <script>
         lucide.createIcons();
-
-        function validarTecla(event, input) {
-            const esPieza = input.getAttribute('data-es-pieza') === 'true';
-            if (!esPieza) return true;
-            const charCode = (event.which) ? event.which : event.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
-            return true;
-        }
-
-        function calcularSaldo(input) {
-            const idx = input.getAttribute('data-index');
-            const actual = parseFloat(document.getElementById(`stock-${idx}`).innerText) || 0;
-            const retiro = parseFloat(input.value) || 0;
-            const total = actual - retiro;
-            const display = document.getElementById(`saldo-${idx}`);
-            display.innerText = total.toFixed(3);
-            display.className = total < 0 ? 'text-alerta' : '';
-        }
-
-        async function registrarSalidas() {
-            const fecha = document.getElementById('fechaConsumo').value;
-            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => i.value > 0);
-            
-            if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
-            if(!fecha) return alert("Seleccione la fecha del consumo.");
-
-            const conteos = inputs.map(i => ({
-                codigo: i.getAttribute('data-codigo'),
-                cantidad: parseFloat(i.value) * -1
-            }));
-
-            if(!confirm(`¿Confirmar retiro de ${conteos.length} artículos con fecha ${fecha}?`)) return;
-
-            const res = await fetch('/procesar-ajuste', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ almacen: '<%= almacenActivo %>', fecha, conteos })
-            });
-
-            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
-            else { alert("❌ Error al guardar."); }
-        }
-
-        function filtrarTabla() {
-            const val = document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const rows = document.getElementsByClassName("stock-row");
-            for (let r of rows) {
-                const text = r.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                r.style.display = text.includes(val) ? "" : "none";
-            }
-        }
+        function validarTecla(e,i){const p=i.getAttribute('data-es-pieza')==='true';if(!p)return true;const c=e.which?e.which:e.keyCode;if(c>31&&(c<48||c>57))return false;return true;}
+        function calcularSaldo(i){const x=i.getAttribute('data-index'),a=parseFloat(document.getElementById(`stock-${x}`).innerText)||0,r=parseFloat(i.value)||0,t=a-r,d=document.getElementById(`saldo-${x}`);d.innerText=t.toFixed(3);d.style.color=t<0?'var(--rojo-bersa)':'var(--azul-bersa)';}
+        async function registrarSalidas(){const f=document.getElementById('fechaConsumo').value,l=Array.from(document.querySelectorAll('.input-fisico')).filter(i=>i.value>0);if(l.length===0)return alert("Ingrese cantidades.");if(!f)return alert("Fecha requerida.");const c=l.map(i=>({codigo:i.getAttribute('data-codigo'),cantidad:parseFloat(i.value)*-1}));if(!confirm(`¿Retirar ${l.length} artículos?`))return;const r=await fetch('/procesar-ajuste',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({almacen:'<%= almacenActivo %>',fecha:f,conteos:c})});if(r.ok){alert("✅ Éxito");location.reload()}else{alert("❌ Error")}}
+        function filtrarTabla(){const v=document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""),r=document.getElementsByClassName("stock-row");for(let e of r)e.style.display=e.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(v)?"":"none"}
     </script>
+    
 </body>
 </html>
