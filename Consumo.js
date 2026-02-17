@@ -27,34 +27,36 @@ app.get('/', (req, res) => {
 app.get('/consumo', validateUserWithGraph, async (req, res) => {
     try {
         const userEmail = req.user.email.toLowerCase();
-        const office = (req.user.verifiedOffice || "").toLowerCase();
-        const selectedWh = req.query.wh; 
+        const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
+        const wh = req.query.wh;
 
-        // 1. Obtener almacenes autorizados
-        const whQuery = office === 'corporativo' 
+        // 1. OBTENER ALMACENES (Aquí estaba el error antes)
+        const whQuery = isCorp 
             ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC'
             : `SELECT a.clave_sap, a.nombre FROM almacenes a 
                JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
                WHERE LOWER(ua.email) = $1 ORDER BY a.nombre ASC`;
         
-        const whsResult = await pool.query(whQuery, office === 'corporativo' ? [] : [userEmail]);
+        const whsResult = await pool.query(whQuery, isCorp ? [] : [userEmail]);
         const activeWh = wh || null;
 
-   let datos = [];
+        // 2. OBTENER PRODUCTOS (Solo si hay almacén seleccionado)
+        let datos = [];
         if (activeWh) {
-            const dataQuery = `
+            const itemsQuery = `
                 SELECT 
                     i.descripcion AS producto, 
                     i.codigo_articulo AS codigo_general, 
                     i.tipo AS unidad,
-                    v.stock_actual -- Ya no necesitamos COALESCE porque filtraremos los nulos
-                FROM vista_inventario_fisico_real v
-                JOIN items i ON v.codigo_general = i.codigo_articulo
-                WHERE v.codigo_almacen = $1 
-                AND v.stock_actual > 0 -- EL FILTRO CLAVE
+                    COALESCE(v.stock_actual, 0) AS stock_actual
+                FROM items i
+                JOIN items_almacen ia ON i.codigo_articulo = ia.codigo_articulo
+                LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
+                    AND v.codigo_almacen = $1
+                WHERE ia.codigo_almacen = $1
                 ORDER BY i.descripcion ASC`;
             
-            const resData = await pool.query(dataQuery, [activeWh]);
+            const resData = await pool.query(itemsQuery, [activeWh]);
             datos = resData.rows;
         }
 
@@ -66,15 +68,15 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         });
 
     } catch (e) { 
-        console.error("❌ ERROR EN GET /CONSUMO:", e.stack);
-        res.status(500).send("Error de servidor"); 
+        console.error("❌ ERROR EN GET /CONSUMO:", e.stack); // Muestra el error real en logs
+        res.status(500).send("Error de servidor: " + e.message); 
     }
 });
 
 app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
+    const { almacen, conteos } = req.body;
     const client = await pool.connect();
     try {
-        const { almacen, conteos } = req.body;
         await client.query('BEGIN');
         for (const item of conteos) {
             await client.query(
@@ -86,7 +88,6 @@ app.post('/procesar-ajuste', validateUserWithGraph, async (req, res) => {
         res.json({ success: true });
     } catch (e) {
         await client.query('ROLLBACK');
-        console.error("❌ ERROR EN POST:", e.message);
         res.status(500).json({ error: e.message });
     } finally { client.release(); }
 });

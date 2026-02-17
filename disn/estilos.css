@@ -1,6 +1,3 @@
-/* IMPORTAMOS FUENTE GRUESA */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-
 /* VARIABLES */
 :root {
     --azul-bersa: rgb(12, 35, 64);
@@ -8,241 +5,110 @@
     --naranja-hover: #e68a00;
     --rojo-bersa: rgb(238, 39, 55);
     --blanco: #ffffff;
-    --gris-claro: rgba(255, 255, 255, 0.1); /* Más visible */
+    --gris-claro: rgba(255, 255, 255, 0.05);
     --negro: #1a1a1a;
 }
 
-/* BASE */
 body {
     background-color: var(--azul-bersa);
     color: var(--blanco);
-    font-family: 'Montserrat', sans-serif; /* Fuente nueva */
+    font-family: 'Segoe UI', sans-serif;
     margin: 0; padding: 0;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 20px;
-}
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 
-/* HEADER */
 .header-top {
     display: flex; justify-content: space-between; align-items: center;
     border-bottom: 3px solid var(--rojo-bersa);
-    padding-bottom: 20px; margin-bottom: 30px;
+    padding-bottom: 15px; margin-bottom: 25px;
 }
+
 .brand { display: flex; align-items: center; gap: 15px; }
 
 .brand-icon {
-    width: 45px; height: 45px;
+    width: 40px; height: 40px;
     background-color: var(--naranja-bersa) !important;
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
 }
 .brand-icon i { color: var(--azul-bersa) !important; stroke-width: 3px; }
 
-/* BOTÓN INICIO */
 .btn-inicio {
-    background-color: #ffffff !important;
-    color: var(--azul-bersa) !important;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 800; /* Bold fuerte */
-    display: flex; align-items: center; gap: 10px;
+    background-color: var(--blanco);
+    color: var(--azul-bersa);
+    text-decoration: none; padding: 10px 22px;
+    border-radius: 8px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
     transition: 0.3s;
-    border: 2px solid transparent;
-    white-space: nowrap;
 }
-.btn-inicio:hover { background-color: #f0f0f0 !important; transform: translateY(-2px); }
+.btn-inicio:hover { background-color: #f0f0f0; transform: translateY(-2px); }
 
-/* --- TOOLBAR UNIFICADA --- */
+/* --- TOOLBAR DE 4 COLUMNAS PARA QUE NO SE ENCIME --- */
 .toolbar-unified {
     display: grid;
-    /* Almacén (Grande) | Producto (Grande) | Fecha (Fijo) | Botón (Fijo) */
-    grid-template-columns: 1.5fr 1.5fr 160px auto;
+    /* Almacen | Buscador | Fecha | Boton */
+    grid-template-columns: 1.5fr 1.5fr 160px auto; 
     gap: 15px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
     padding: 20px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 158, 27, 0.3);
+    border: 1px solid rgba(255, 158, 27, 0.2);
     margin-bottom: 25px;
-    align-items: flex-end; /* Alinea todo abajo */
+    align-items: flex-end;
 }
 
-/* Si la pantalla es muy chica, que se acomoden en dos filas automáticamente */
-@media (max-width: 1100px) {
-    .toolbar-unified {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-.toolbar-group-left {
-    display: flex; gap: 20px; flex: 1; min-width: 300px;
-}
-
-.toolbar-group-right {
-    display: flex; gap: 20px; align-items: flex-end;
-}
-
-.input-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-/* --- ESTILOS PARA EL BUSCADOR DE ALMACENES (TOM SELECT) --- */
-.ts-control {
-    background-color: #1e3a5f !important;
-    color: white !important;
-    border: 2px solid rgba(255, 158, 27, 0.5) !important;
-    border-radius: 8px !important;
-    height: 50px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.ts-control input {
-    color: white !important;
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600;
-}
-
-/* Menú desplegable (La lista de opciones) */
-.ts-dropdown {
-    background-color: var(--azul-bersa) !important;
-    border: 1px solid var(--naranja-bersa) !important;
-    color: white !important;
-}
-
-/* Opción seleccionada o hover */
-.ts-dropdown .active {
-    background-color: var(--naranja-bersa) !important;
-    color: var(--azul-bersa) !important;
-    font-weight: bold;
-}
-
-/* Icono de flecha */
-.ts-wrapper.single .ts-control:after {
-    border-color: white transparent transparent transparent !important;
-}
-
-.ts-control .input-placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-    font-style: italic;
-}
-
-/* Cuando escribes, que el texto sea blanco */
-.ts-control input {
-    color: white !important;
-}
-
-/* Quitar borde azul al escribir */
-.ts-control.focus {
-    border-color: var(--naranja-bersa) !important;
-    box-shadow: 0 0 10px rgba(255, 158, 27, 0.2) !important;
-}
-
+.input-wrapper { display: flex; flex-direction: column; width: 100%; }
 
 .label-herramienta {
     color: var(--naranja-bersa);
-    font-size: 12px;
-    font-weight: 900; /* Extra Bold */
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: block;
-    letter-spacing: 0.5px;
+    font-size: 11px; font-weight: 800;
+    text-transform: uppercase; margin-bottom: 8px;
 }
 
-/* INPUTS (CORREGIDOS PARA VERSE BIEN) */
 .search-input {
-    width: 100%;
-    height: 50px;
-    padding: 0 15px;
-    background-color: #1e3a5f;
+    width: 100%; height: 45px; padding: 0 15px;
+    background-color: rgba(255, 255, 255, 0.05);
     color: white;
-    border: 2px solid rgba(255, 158, 27, 0.5);
-    border-radius: 8px;
-    outline: none;
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box;
+    border: 1px solid rgba(255, 158, 27, 0.3);
+    border-radius: 8px; outline: none;
 }
 
-/* El botón blanco se mantiene igual, solo asegúrate que tenga white-space: nowrap */
-.btn-registrar-blanco {
-    white-space: nowrap;
+/* --- ESTILOS PARA TOM SELECT (BUSCADOR DE ALMACÉN) --- */
+.ts-control {
+    background-color: #1e3a5f !important; /* Azul más claro */
+    color: white !important;
+    border: 1px solid rgba(255, 158, 27, 0.3) !important;
+    border-radius: 8px !important;
+    height: 45px !important;
+    display: flex !important; align-items: center !important;
 }
-
-.search-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 400;
-}
-
-.search-input:focus {
-    border-color: var(--naranja-bersa);
-    background-color: #24426b !important;
-    box-shadow: 0 0 15px rgba(255, 158, 27, 0.2);
-}
-
-select.search-input { cursor: pointer; appearance: auto; }
-input[type="date"].search-input { cursor: pointer; }
+.ts-control input { color: white !important; }
+.ts-dropdown { background-color: var(--azul-bersa) !important; border: 1px solid var(--naranja-bersa) !important; color: white !important; }
+.ts-dropdown .active { background-color: var(--naranja-bersa) !important; color: var(--azul-bersa) !important; font-weight: bold; }
 
 /* BOTÓN REGISTRAR */
 .btn-registrar-blanco {
-    height: 50px; padding: 0 30px;
-    background-color: #ffffff;
-    color: var(--azul-bersa);
-    border: none; border-radius: 8px;
-    font-weight: 900; /* Extra Bold */
-    cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
-    transition: 0.3s;
-    white-space: nowrap;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    height: 45px; padding: 0 25px;
+    background-color: #ffffff; color: var(--azul-bersa);
+    border: none; border-radius: 8px; font-weight: 800;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: 0.3s; white-space: nowrap;
 }
-.btn-registrar-blanco:hover {
-    background-color: #f8f8f8;
-    transform: translateY(-2px);
-}
+.btn-registrar-blanco:hover { background-color: #f0f0f0; transform: translateY(-2px); }
 
 /* TABLA */
-.table-wrapper { overflow-x: auto; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-.stock-table { width: 100%; border-collapse: collapse; }
-
-.stock-table th { 
-    background: var(--naranja-bersa); 
-    color: var(--azul-bersa); /* Letras oscuras en el encabezado para más contraste */
-    padding: 18px; 
-    font-size: 0.9em; 
-    text-transform: uppercase;
-    font-weight: 900; /* Extra Bold */
-    letter-spacing: 0.5px;
-}
-
-.stock-row { background-color: var(--blanco); border-bottom: 1px solid #ddd; }
-.stock-row td { padding: 15px; color: var(--negro); vertical-align: middle; }
-
-/* TIPOGRAFÍA DE CELDAS */
-.text-bold-negro { 
-    font-weight: 800; 
-    color: var(--azul-bersa) !important; 
-    font-size: 1.1em;
-}
-.text-bold-naranja { 
-    font-weight: 900; 
-    color: var(--naranja-bersa) !important; 
-    text-transform: uppercase;
-    font-size: 0.95em;
-}
-.input-fisico {
-    width: 110px; height: 40px;
-    border: 2px solid #ccc; border-radius: 6px;
-    text-align: center; font-weight: 800; font-size: 1.1em;
-    color: var(--azul-bersa);
-}
-.input-fisico:focus { border-color: var(--naranja-bersa); outline: none; }
-
-.no-data { text-align: center; padding: 60px; color: rgba(255,255,255,0.6); font-style: italic; font-size: 1.1em; }
+.table-wrapper { overflow-x: auto; }
+.stock-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+.stock-table th { background: var(--naranja-bersa); color: var(--blanco); padding: 15px; font-size: 0.8em; text-transform: uppercase; font-weight: 800; }
+.stock-table th:first-child { text-align: left; border-radius: 8px 0 0 8px; }
+.stock-table th:last-child { border-radius: 0 8px 8px 0; }
+.stock-row { background-color: var(--blanco); }
+.stock-row td { padding: 15px; color: var(--negro); border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.stock-row td:first-child { border-left: 1px solid #eee; border-radius: 8px 0 0 8px; }
+.stock-row td:last-child { border-right: 1px solid #eee; border-radius: 0 8px 8px 0; }
+.input-fisico { width: 100px; height: 38px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-weight: bold; }
+.no-data { text-align: center; padding: 40px; color: white; opacity: 0.5; }
+.text-bold-negro { font-weight: 800; color: var(--azul-bersa); }
+.text-bold-naranja { font-weight: 700; color: var(--naranja-bersa); }
+.text-alerta { color: var(--rojo-bersa) !important; font-weight: 900; }

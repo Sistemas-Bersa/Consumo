@@ -6,60 +6,54 @@
     <title>Consumo | Bersa Cloud</title>
     <link rel="stylesheet" href="/estilos.css">
     
-    <!-- LIBRERÍA PARA BUSCADOR DE ALMACENES (TOM SELECT) -->
+    <!-- LIBRERÍAS PARA BUSCADOR Y ICONOS -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <header class="header-top">
             <div class="brand">
-                <div class="brand-icon">
-                    <i data-lucide="minus-circle"></i>
-                </div>
+                <div class="brand-icon"><i data-lucide="minus-circle"></i></div>
                 <h1 style="margin:0">Módulo <span class="text-naranja">Consumo</span></h1>
             </div>
             <a href="https://bersacloud.app" class="btn-inicio">
-                <i data-lucide="home" size="20"></i> INICIO
+                <i data-lucide="home" size="18"></i> INICIO
             </a>
         </header>
 
-        <!-- TOOLBAR -->
+        <!-- TOOLBAR DE 4 COLUMNAS -->
         <div class="toolbar-unified">
-            
-            <!-- 1. ALMACÉN (CON BUSCADOR) -->
+            <!-- 1. ALMACÉN (Con Buscador TomSelect) -->
             <div class="input-wrapper">
-                <label class="label-herramienta">ALMACÉN / UNIDAD</label>
-                <!-- Quitamos la clase search-input para que TomSelect tome el control -->
-              <select id="selectorAlmacen" class="search-input" placeholder="Escribe para buscar almacén...">
-    <!-- Opción vacía para el placeholder -->
-    <option value="">Seleccione un almacén...</option>
-
-    <% almacenesPermitidos.forEach(wh => { %>
-        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>>
-            <%= wh.nombre %>
-        </option>
-    <% }) %>
-</select>
+                <label class="label-herramienta">ALMACÉN</label>
+                <select id="selectorAlmacen" placeholder="Buscar almacén...">
+                    <option value="">Seleccione...</option>
+                    <% almacenesPermitidos.forEach(wh => { %>
+                        <option value="<%= wh.clave_sap %>" <%= almacenActivo === wh.clave_sap ? 'selected' : '' %>>
+                            <%= wh.nombre %>
+                        </option>
+                    <% }) %>
+                </select>
             </div>
 
-            <!-- 2. BUSCADOR DE PRODUCTOS -->
+            <!-- 2. BUSCADOR PRODUCTO -->
             <div class="input-wrapper">
-                <label class="label-herramienta">FILTRAR PRODUCTO</label>
-                <input type="text" id="buscador" class="search-input" placeholder="Escribir..." onkeyup="filtrarTabla()">
+                <label class="label-herramienta">BUSCAR PRODUCTO</label>
+                <input type="text" id="buscador" class="search-input" placeholder="Filtrar por nombre..." onkeyup="filtrarTabla()">
             </div>
 
             <!-- 3. FECHA -->
-            <div class="input-wrapper" style="width: 100%;">
+            <div class="input-wrapper">
                 <label class="label-herramienta">FECHA SALIDA</label>
                 <input type="date" id="fechaConsumo" class="search-input" value="<%= new Date().toISOString().split('T')[0] %>">
             </div>
             
             <!-- 4. BOTÓN -->
             <button onclick="registrarSalidas()" class="btn-registrar-blanco">
-                <i data-lucide="send" size="20"></i> REGISTRAR SALIDAS
+                <i data-lucide="send" size="18"></i> REGISTRAR SALIDAS
             </button>
         </div>
 
@@ -68,7 +62,7 @@
             <table class="stock-table" id="tablaStock">
                 <thead>
                     <tr>
-                        <th style="width: 40%; text-align: left;">Producto</th>
+                        <th style="width: 40%;">Producto</th>
                         <th style="width: 15%;">Unidad</th>
                         <th style="width: 15%;">Stock Actual</th>
                         <th style="width: 15%;">Retirar</th>
@@ -81,15 +75,15 @@
                             <% const esPieza = (p.unidad || '').toUpperCase().includes('PIEZA'); %>
                             <tr class="stock-row">
                                 <td class="text-bold-negro"><%= p.producto %></td>
-                                <td class="text-bold-naranja" style="text-align: center;"><%= p.unidad %></td>
+                                <td class="text-bold-naranja" style="text-align: center;"><%= p.unidad || 'PZ' %></td>
                                 <td style="text-align: center; font-weight: bold;">
-                                    <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
+                                    <span id="stock-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
                                 </td>
                                 <td style="text-align: center;">
                                     <input type="number" 
                                            class="input-fisico" 
                                            step="<%= esPieza ? '1' : 'any' %>" 
-                                           placeholder="<%= esPieza ? '0' : '0.000' %>"
+                                           placeholder="0.000"
                                            data-codigo="<%= p.codigo_general %>"
                                            data-index="<%= index %>"
                                            data-es-pieza="<%= esPieza %>"
@@ -97,12 +91,12 @@
                                            oninput="calcularSaldo(this)">
                                 </td>
                                 <td style="text-align: center; font-weight: 900; color: var(--azul-bersa);">
-                                    <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual || 0).toFixed(3) %></span>
+                                    <span id="saldo-<%= index %>"><%= parseFloat(p.stock_actual).toFixed(3) %></span>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
-                        <tr><td colspan="5" class="no-data">No hay productos disponibles.</td></tr>
+                        <tr><td colspan="5" class="no-data">Seleccione un almacén para ver el inventario.</td></tr>
                     <% } %>
                 </tbody>
             </table>
@@ -112,54 +106,20 @@
     <script>
         lucide.createIcons();
 
-        // INICIALIZAR EL BUSCADOR DE ALMACENES
-new TomSelect("#selectorAlmacen", {
-    create: false,
-    sortField: { field: "text", direction: "asc" },
-    placeholder: "🔍 Buscar almacén...", // Texto que sale cuando está vacío
-    allowEmptyOption: true,
-    onChange: function(value) {
-        if (value) {
-            // Solo redirige si seleccionó un valor real
-            location.href = '/consumo?wh=' + value;
-        }
-    }
-});
+        // Inicializamos el buscador de almacén
+        new TomSelect("#selectorAlmacen", {
+            create: false,
+            sortField: { field: "text", direction: "asc" },
+            allowEmptyOption: true,
+            onChange: function(value) {
+                if(value) location.href = '/consumo?wh=' + value;
+            }
+        });
 
-        // TUS FUNCIONES EXISTENTES
         function validarTecla(e,i){const p=i.getAttribute('data-es-pieza')==='true';if(!p)return true;const c=e.which?e.which:e.keyCode;if(c>31&&(c<48||c>57))return false;return true;}
         function calcularSaldo(i){const x=i.getAttribute('data-index'),a=parseFloat(document.getElementById(`stock-${x}`).innerText)||0,r=parseFloat(i.value)||0,t=a-r,d=document.getElementById(`saldo-${x}`);d.innerText=t.toFixed(3);d.className=t<0?'text-alerta text-bold-negro':'text-bold-negro';}
-        
-        async function registrarSalidas() {
-            const fecha = document.getElementById('fechaConsumo').value;
-            const inputs = Array.from(document.querySelectorAll('.input-fisico')).filter(i => i.value > 0);
-            if(inputs.length === 0) return alert("Ingrese cantidades a retirar.");
-            
-            const conteos = inputs.map(i => ({
-                codigo: i.getAttribute('data-codigo'),
-                cantidad: parseFloat(i.value) * -1
-            }));
-
-            if(!confirm(`¿Confirmar retiro con fecha ${fecha}?`)) return;
-
-            const res = await fetch('/procesar-ajuste', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ almacen: '<%= almacenActivo %>', fecha, conteos })
-            });
-
-            if (res.ok) { alert("✅ Consumo registrado."); location.reload(); }
-            else { alert("❌ Error al guardar."); }
-        }
-
-        function filtrarTabla() {
-            const val = document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const rows = document.getElementsByClassName("stock-row");
-            for (let r of rows) {
-                const text = r.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                r.style.display = text.includes(val) ? "" : "none";
-            }
-        }
+        async function registrarSalidas(){const f=document.getElementById('fechaConsumo').value,l=Array.from(document.querySelectorAll('.input-fisico')).filter(i=>i.value>0);if(l.length===0)return alert("Ingrese cantidades.");const c=l.map(i=>({codigo:i.getAttribute('data-codigo'),cantidad:parseFloat(i.value)*-1}));if(!confirm(`¿Retirar ${l.length} artículos?`))return;const r=await fetch('/procesar-ajuste',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({almacen:'<%= almacenActivo %>',fecha:f,conteos:c})});if(r.ok){alert("✅ Éxito");location.reload()}else{alert("❌ Error")}}
+        function filtrarTabla(){const v=document.getElementById("buscador").value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""),r=document.getElementsByClassName("stock-row");for(let e of r)e.style.display=e.innerText.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(v)?"":"none"}
     </script>
 </body>
 </html>
