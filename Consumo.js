@@ -43,31 +43,34 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         // 2. CONSULTA HÍBRIDA CON STOCK ACTUAL
         let datos = [];
         if (activeWh) {
-            const itemsQuery = `
-                WITH control AS (
-                    SELECT count(*) > 0 as es_gestionado
-                    FROM items_almacen
-                    WHERE codigo_almacen = $1
-                )
-                SELECT 
-                    i.descripcion AS producto, 
-                    i.codigo_articulo AS codigo_general, 
-                    i.tipo AS unidad,
-                    COALESCE(v.stock_actual, 0) AS stock_actual
-                FROM items i
-                CROSS JOIN control
-                LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
-                    AND v.codigo_almacen = $1
-                WHERE 
-                    NOT control.es_gestionado
-                    OR
-                    (control.es_gestionado AND EXISTS (
-                        SELECT 1 FROM items_almacen ia 
-                        WHERE ia.codigo_almacen = $1 
-                        AND ia.codigo_articulo = i.codigo_articulo 
-                        AND ia.habilitado = true
-                    ))
-                ORDER BY i.descripcion ASC`;
+const itemsQuery = `
+    WITH control AS (
+        SELECT count(*) > 0 as es_gestionado
+        FROM items_almacen
+        WHERE codigo_almacen = $1
+    )
+    SELECT 
+        i.descripcion AS producto, 
+        i.codigo_articulo AS codigo_general, 
+        i.tipo AS unidad,
+        v.stock_actual 
+    FROM items i
+    CROSS JOIN control
+    -- Usamos INNER JOIN con la vista de stock para que SOLO traiga lo que existe
+    JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
+    WHERE v.codigo_almacen = $1 
+    AND v.stock_actual > 0 -- FILTRO DE ORO: Elimina los ceros
+    AND (
+        NOT control.es_gestionado
+        OR
+        (control.es_gestionado AND EXISTS (
+            SELECT 1 FROM items_almacen ia 
+            WHERE ia.codigo_almacen = $1 
+            AND ia.codigo_articulo = i.codigo_articulo 
+            AND ia.habilitado = true
+        ))
+    )
+    ORDER BY i.descripcion ASC`;
             
             const resData = await pool.query(itemsQuery, [activeWh]);
             datos = resData.rows;
