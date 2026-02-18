@@ -27,33 +27,46 @@ app.get('/', (req, res) => {
 app.get('/consumo', validateUserWithGraph, async (req, res) => {
     try {
         const userEmail = req.user.email.toLowerCase();
-        const isCorp = (req.user.verifiedOffice || "").toLowerCase() === 'corporativo';
-        const wh = req.query.wh;
+        const office = (req.user.verifiedOffice || "").toLowerCase();
+        const wh = req.query.wh; 
 
-        // 1. OBTENER ALMACENES (Aquí estaba el error antes)
-        const whQuery = isCorp 
+        // 1. OBTENER ALMACENES PERMITIDOS
+        const whQuery = office === 'corporativo' 
             ? 'SELECT clave_sap, nombre FROM almacenes ORDER BY nombre ASC'
             : `SELECT a.clave_sap, a.nombre FROM almacenes a 
                JOIN usuario_almacenes ua ON a.clave_sap = ua.codigo_almacen 
                WHERE LOWER(ua.email) = $1 ORDER BY a.nombre ASC`;
         
-        const whsResult = await pool.query(whQuery, isCorp ? [] : [userEmail]);
+        const whsResult = await pool.query(whQuery, office === 'corporativo' ? [] : [userEmail]);
         const activeWh = wh || null;
 
-        // 2. OBTENER PRODUCTOS (Solo si hay almacén seleccionado)
+        // 2. CONSULTA HÍBRIDA CON STOCK ACTUAL
         let datos = [];
         if (activeWh) {
             const itemsQuery = `
+                WITH control AS (
+                    SELECT count(*) > 0 as es_gestionado
+                    FROM items_almacen
+                    WHERE codigo_almacen = $1
+                )
                 SELECT 
                     i.descripcion AS producto, 
                     i.codigo_articulo AS codigo_general, 
                     i.tipo AS unidad,
                     COALESCE(v.stock_actual, 0) AS stock_actual
                 FROM items i
-                JOIN items_almacen ia ON i.codigo_articulo = ia.codigo_articulo
+                CROSS JOIN control
                 LEFT JOIN vista_inventario_fisico_real v ON v.codigo_general = i.codigo_articulo 
                     AND v.codigo_almacen = $1
-                WHERE ia.codigo_almacen = $1
+                WHERE 
+                    NOT control.es_gestionado
+                    OR
+                    (control.es_gestionado AND EXISTS (
+                        SELECT 1 FROM items_almacen ia 
+                        WHERE ia.codigo_almacen = $1 
+                        AND ia.codigo_articulo = i.codigo_articulo 
+                        AND ia.habilitado = true
+                    ))
                 ORDER BY i.descripcion ASC`;
             
             const resData = await pool.query(itemsQuery, [activeWh]);
@@ -68,7 +81,7 @@ app.get('/consumo', validateUserWithGraph, async (req, res) => {
         });
 
     } catch (e) { 
-        console.error("❌ ERROR EN GET /CONSUMO:", e.stack); // Muestra el error real en logs
+        console.error("❌ ERROR EN GET /CONSUMO:", e.stack);
         res.status(500).send("Error de servidor: " + e.message); 
     }
 });
